@@ -1,45 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from './lib/supabase';
 import QRScanner from './components/QRScanner.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
   const [searchCode, setSearchCode] = useState('');
   const [element, setElement] = useState(null);
-  const [scanning, setScanning] = useState(false); // Controla si está escaneando
+  const [scanning, setScanning] = useState(false);
+  const [elementos, setElementos] = useState({}); // Almacena elementos desde Supabase
 
-  // Datos de ejemplo
-  const mockElements = {
-    'MAT-001': {
-      nombre: 'Manguera 2.5 pulgadas',
-      tipo: 'Manga',
-      caracteristicas: '20 metros, caucho reforzado',
-      estado: 'Bueno',
-      en_servicio: 'Sí',
-      ubicacion_tipo: 'Móvil',
-      ubicacion_id: '5',
-      baulera_numero: '3',
-      deposito_nombre: '',
-      ultima_inspeccion: '15/03/2025',
-      proxima_inspeccion: '15/09/2025',
-      vencimiento: '-',
-      foto_url: 'https://via.placeholder.com/300x200?text=Manguera'
-    },
-    'LAN-001': {
-      nombre: 'Lanza Monchada',
-      tipo: 'Lanzas',
-      caracteristicas: 'Ajuste de chorro, acero inox',
-      estado: 'Bueno',
-      en_servicio: 'Sí',
-      ubicacion_tipo: 'Depósito',
-      ubicacion_id: '',
-      baulera_numero: '',
-      deposito_nombre: 'Depósito Cuartel 1',
-      ultima_inspeccion: '10/02/2025',
-      proxima_inspeccion: '10/08/2025',
-      vencimiento: '-',
-      foto_url: 'https://via.placeholder.com/300x200?text=Lanza'
-    }
-  };
+  // Cargar elementos desde Supabase al iniciar
+  useEffect(() => {
+    const cargarElementos = async () => {
+      const { data, error } = await supabase
+        .from('elementos')
+        .select('*');
+
+      if (error) {
+        console.error('Error al cargar elementos:', error);
+        alert('No se pudo conectar a la base de datos. Revisá la conexión o contactá al admin.');
+      } else {
+        const elementosMap = {};
+        data.forEach(el => {
+          elementosMap[el.codigo_qr] = el;
+        });
+        setElementos(elementosMap);
+      }
+    };
+
+    cargarElementos();
+  }, []);
 
   const handleLogin = (legajo, password) => {
     if (legajo === '001' && password === 'bombero') {
@@ -54,24 +44,25 @@ function App() {
   };
 
   const handleSearch = () => {
-    const found = mockElements[searchCode.trim().toUpperCase()];
+    const code = searchCode.trim().toUpperCase();
+    const found = elementos[code];
     if (found) {
       setElement(found);
     } else {
-      alert('Elemento no encontrado');
+      alert(`Elemento "${code}" no encontrado en el inventario`);
     }
   };
 
   // Cuando se escanea un QR
   const handleScan = (code) => {
-    setSearchCode(code);
+    const cleanedCode = code.trim().toUpperCase();
+    setSearchCode(cleanedCode);
     setScanning(false);
-    // Opcional: buscar automáticamente
-    const found = mockElements[code.trim().toUpperCase()];
+    const found = elementos[cleanedCode];
     if (found) {
       setElement(found);
     } else {
-      alert(`Elemento ${code} no encontrado en el inventario`);
+      alert(`Elemento "${cleanedCode}" no encontrado en el inventario`);
     }
   };
 
@@ -89,7 +80,7 @@ function App() {
       </header>
 
       <div className="container mx-auto p-4">
-        {/* Botón de escaneo (visible para todos) */}
+        {/* Botón de escaneo */}
         <div style={{ marginTop: '16px', marginBottom: '24px' }}>
           <button
             onClick={() => setScanning(true)}
@@ -284,11 +275,11 @@ function App() {
             <div style={{ lineHeight: '1.8' }}>
               <p><strong>Tipo:</strong> {element.tipo}</p>
               <p><strong>Estado:</strong> {element.estado}</p>
-              <p><strong>En servicio:</strong> {element.en_servicio}</p>
+              <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
               <p><strong>Ubicación:</strong> 
                 {element.ubicacion_tipo === 'Móvil'
                   ? `Móvil ${element.ubicacion_id}, Baulera ${element.baulera_numero}`
-                  : `Depósito ${element.deposito_nombre}`}
+                  : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
               </p>
               <p><strong>Última inspección:</strong> {element.ultima_inspeccion}</p>
               <p><strong>Próxima:</strong> {element.proxima_inspeccion}</p>
