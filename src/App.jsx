@@ -1,108 +1,78 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
-import QRScanner from './components/QRScanner.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
   const [searchCode, setSearchCode] = useState('');
   const [element, setElement] = useState(null);
-  const [scanning, setScanning] = useState(false);
   const [elementos, setElementos] = useState({});
 
   // Cargar elementos desde Supabase
   useEffect(() => {
     const cargarElementos = async () => {
-      const { data, error } = await supabase
-        .from('elementos')
-        .select('*');
-
+      const { data, error } = await supabase.from('elementos').select('*');
       if (error) {
-        console.error('Error al cargar elementos:', error);
-        alert('No se pudo conectar a la base de datos. Revisá la conexión.');
+        alert('Error al cargar: ' + error.message);
       } else {
-        const elementosMap = {};
+        const map = {};
         data.forEach(el => {
-          elementosMap[el.codigo_qr] = el;
+          map[el.codigo_qr] = el;
         });
-        setElementos(elementosMap);
+        setElementos(map);
       }
     };
-
     cargarElementos();
   }, []);
 
-  // Función para crear un nuevo elemento
   const crearElemento = async (nuevoElemento) => {
-    const { data, error } = await supabase
-      .from('elementos')
-      .insert([nuevoElemento]);
-
+    const { error } = await supabase.from('elementos').insert([nuevoElemento]);
     if (error) {
       alert('Error al crear: ' + error.message);
     } else {
-      alert('✅ Elemento creado con éxito');
-      // Recargar lista
-      const {  nuevos } = await supabase.from('elementos').select('*');
+      alert('✅ Creado. Recargando...');
+      const { data } = await supabase.from('elementos').select('*');
       const map = {};
-      nuevos.forEach(el => {
-        map[el.codigo_qr] = el;
-      });
+      data.forEach(el => { map[el.codigo_qr] = el; });
       setElementos(map);
     }
   };
 
-  // Función para actualizar un elemento
-  const actualizarElemento = async (codigo_qr, cambios) => {
+  const actualizarElemento = async (codigo, cambios) => {
     const { error } = await supabase
       .from('elementos')
       .update(cambios)
-      .eq('codigo_qr', codigo_qr);
-
+      .eq('codigo_qr', codigo);
     if (error) {
       alert('Error al actualizar: ' + error.message);
     } else {
-      alert('✅ Elemento actualizado');
-      // Recargar lista
-      const {  nuevos } = await supabase.from('elementos').select('*');
+      alert('✅ Actualizado');
+      const { data } = await supabase.from('elementos').select('*');
       const map = {};
-      nuevos.forEach(el => {
-        map[el.codigo_qr] = el;
-      });
+      data.forEach(el => { map[el.codigo_qr] = el; });
       setElementos(map);
     }
   };
 
   const handleLogin = (legajo, password) => {
-    if (legajo === '001' && password === 'bombero') {
-      setUser({ legajo, role: 'lectura' });
-    } else if (legajo === '100' && password === 'operador') {
-      setUser({ legajo, role: 'operador' });
-    } else if (legajo === '999' && password === 'admin') {
-      setUser({ legajo, role: 'admin' });
-    } else {
-      alert('Legajo o contraseña incorrecta');
-    }
+    if (legajo === '001' && password === 'bombero') setUser({ legajo, role: 'lectura' });
+    else if (legajo === '100' && password === 'operador') setUser({ legajo, role: 'operador' });
+    else if (legajo === '999' && password === 'admin') setUser({ legajo, role: 'admin' });
+    else alert('Legajo o contraseña incorrecta');
   };
 
   const handleSearch = () => {
     const code = searchCode.trim().toUpperCase();
     const found = elementos[code];
-    if (found) {
-      setElement(found);
-    } else {
-      alert(`Elemento "${code}" no encontrado`);
-    }
+    if (found) setElement(found);
+    else alert('No encontrado');
   };
 
-  const handleScan = (code) => {
-    const cleanedCode = code.trim().toUpperCase();
-    setSearchCode(cleanedCode);
-    setScanning(false);
-    const found = elementos[cleanedCode];
-    if (found) {
-      setElement(found);
-    } else {
-      alert(`Elemento "${cleanedCode}" no encontrado`);
+  const handleScan = () => {
+    const code = prompt('Simulación de escaneo: ingresá el código QR (ej: MAT-001)');
+    if (code) {
+      const found = elementos[code.trim().toUpperCase()];
+      if (found) setElement(found);
+      else alert('No encontrado');
     }
   };
 
@@ -111,233 +81,124 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header style={{ backgroundColor: '#b91c1c', color: 'white', padding: '16px' }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>BomberoStock</h1>
-          <p>Legajo: {user.legajo} • Rol: {user.role}</p>
-        </div>
+    <div style={{ fontFamily: 'Arial, sans-serif', padding: '16px', maxWidth: '800px', margin: '0 auto' }}>
+      <header style={{ backgroundColor: '#b91c1c', color: 'white', padding: '16px', borderRadius: '8px', marginBottom: '24px' }}>
+        <h1 style={{ margin: 0 }}>BomberoStock</h1>
+        <p>Legajo: {user.legajo} • Rol: {user.role}</p>
       </header>
 
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
-        {/* Botón de escaneo */}
-        <div style={{ marginTop: '16px', marginBottom: '24px' }}>
-          <button
-            onClick={() => setScanning(true)}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              fontSize: '16px'
-            }}
-          >
-            📷 Escanear Código QR
-          </button>
-        </div>
+      <button
+        onClick={handleScan}
+        style={{
+          width: '100%',
+          padding: '12px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          border: 'none',
+          borderRadius: '6px',
+          fontWeight: 'bold',
+          fontSize: '16px',
+          marginBottom: '24px'
+        }}
+      >
+        📷 Escanear QR (simulado)
+      </button>
 
-        {!element && !scanning && (
-          <div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>Buscar elemento</h2>
-            <div style={{ marginBottom: '16px' }}>
-              <input
-                type="text"
-                value={searchCode}
-                onChange={(e) => setSearchCode(e.target.value)}
-                placeholder="Ej: MAT-001"
-                style={{
-                  padding: '8px',
-                  border: '1px solid #ccc',
-                  borderRadius: '4px',
-                  width: '70%',
-                  marginRight: '8px'
-                }}
-                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-              />
+      {!element && (
+        <div>
+          <h2>Buscar elemento</h2>
+          <input
+            type="text"
+            value={searchCode}
+            onChange={(e) => setSearchCode(e.target.value)}
+            placeholder="Ej: MAT-001"
+            style={{ padding: '8px', width: '70%', border: '1px solid #ccc', borderRadius: '4px' }}
+            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          />
+          <button onClick={handleSearch} style={{ padding: '8px 12px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px' }}>Buscar</button>
+
+          {(user.role === 'operador' || user.role === 'admin') && (
+            <div style={{ marginTop: '24px', padding: '16px', border: '1px solid #ccc', borderRadius: '8px' }}>
+              <h3>Acciones de Operador</h3>
               <button
-                onClick={handleSearch}
+                onClick={() => {
+                  const codigo = prompt('Código QR (ej: MAT-001)');
+                  if (!codigo) return;
+                  const nombre = prompt('Nombre del elemento');
+                  if (!nombre) return;
+                  const tipo = prompt('Tipo (ej: Manga, Lanza)');
+                  const estado = prompt('Estado (Bueno, Regular, Malo)', 'Bueno');
+                  const enServicio = prompt('¿En servicio? (true/false)', 'true') === 'true';
+                  const ultimaInspeccion = prompt('Última inspección (AAAA-MM-DD)', new Date().toISOString().split('T')[0]);
+                  const proximaInspeccion = prompt('Próxima inspección (AAAA-MM-DD)', '');
+                  const vencimiento = prompt('Vencimiento (AAAA-MM-DD)', '');
+                  const caracteristicas = prompt('Características (opcional)', '');
+                  
+                  const ubicacionTipo = prompt('Ubicación (Móvil o Depósito)', '').trim();
+                  let ubicacionId = '';
+                  let bauleraNumero = '';
+                  let depositoNombre = '';
+
+                  if (ubicacionTipo.toLowerCase() === 'móvil') {
+                    ubicacionId = prompt('Número de móvil', '');
+                    bauleraNumero = prompt('Número de baulera (opcional)', '');
+                  } else if (ubicacionTipo.toLowerCase() === 'depósito') {
+                    depositoNombre = prompt('Nombre del depósito', '');
+                  }
+
+                  const fotoUrl = prompt('URL de la foto (opcional)', '');
+
+                  crearElemento({
+                    codigo_qr: codigo.trim().toUpperCase(),
+                    nombre,
+                    tipo,
+                    estado,
+                    en_servicio: enServicio,
+                    ultima_inspeccion: ultimaInspeccion || null,
+                    proxima_inspeccion: proximaInspeccion || null,
+                    vencimiento: vencimiento || null,
+                    caracteristicas: caracteristicas || null,
+                    ubicacion_tipo: ubicacionTipo || null,
+                    ubicacion_id: ubicacionId || null,
+                    baulera_numero: bauleraNumero || null,
+                    deposito_nombre: depositoNombre || null,
+                    foto_url: fotoUrl || null
+                  });
+                }}
                 style={{
-                  padding: '8px 12px',
+                  display: 'block',
+                  width: '100%',
+                  padding: '10px',
                   backgroundColor: '#28a745',
                   color: 'white',
                   border: 'none',
                   borderRadius: '4px',
+                  marginBottom: '8px',
                   cursor: 'pointer'
                 }}
               >
-                Buscar
+                + Cargar elemento nuevo
               </button>
-            </div>
 
-            {/* Acciones de Operador */}
-            {(user.role === 'operador' || user.role === 'admin') && (
-              <div style={{
-                marginTop: '24px',
-                padding: '16px',
-                border: '1px solid #ccc',
-                borderRadius: '8px',
-                backgroundColor: '#f8f9fa'
-              }}>
-                <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Acciones de Operador</h3>
-                <button
-                  onClick={() => {
-                    const codigo = prompt('Código QR (ej: MAT-001)');
-                    if (!codigo) return;
-                    const nombre = prompt('Nombre del elemento');
-                    if (!nombre) return;
-                    const tipo = prompt('Tipo (ej: Manga, Lanza, Cizalla)');
-                    if (!tipo) return;
-
-                    const estado = prompt('Estado (Bueno, Regular, Malo)', 'Bueno') || 'Bueno';
-                    const enServicio = prompt('¿En servicio? (true/false)', 'true') === 'true';
-                    const ultimaInspeccion = prompt('Última inspección (AAAA-MM-DD)', new Date().toISOString().split('T')[0]);
-
-                    const ubicacionTipoRaw = prompt('Ubicación (Móvil o Depósito)', '').trim();
-                    let ubicacionTipo = '';
-                    let ubicacionId = '';
-                    let bauleraNumero = '';
-                    let depositoNombre = '';
-
-                    if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('movil')) {
-                      ubicacionTipo = 'Móvil';
-                      ubicacionId = prompt('Número de móvil (ej: 3)', '') || '';
-                      bauleraNumero = prompt('Número de baulera (opcional)', '') || '';
-                    } else if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('deposito')) {
-                      ubicacionTipo = 'Depósito';
-                      depositoNombre = prompt('Nombre del depósito (Depósito 1 o Depósito 2)', '') || '';
-                    }
-
-                    const caracteristicas = prompt('Características (opcional)', '') || null;
-                    const proximaInspeccion = prompt('Próxima inspección (AAAA-MM-DD, opcional)', '') || null;
-                    const vencimiento = prompt('Vencimiento (AAAA-MM-DD, opcional)', '') || null;
-                    const fotoUrl = prompt('URL de la foto (opcional)', '') || null;
-
-                    crearElemento({
-                      codigo_qr: codigo.trim().toUpperCase(),
-                      nombre,
-                      tipo,
-                      estado,
-                      en_servicio: enServicio,
-                      ultima_inspeccion: ultimaInspeccion || null,
-                      proxima_inspeccion: proximaInspeccion === '' ? null : proximaInspeccion,
-                      vencimiento: vencimiento === '' ? null : vencimiento,
-                      caracteristicas,
-                      foto_url: fotoUrl,
-                      ubicacion_tipo: ubicacionTipo || null,
-                      ubicacion_id: ubicacionId || null,
-                      baulera_numero: bauleraNumero || null,
-                      deposito_nombre: depositoNombre || null
-                    });
-                  }}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Cargar elemento nuevo
-                </button>
-              </div>
-            )}
-
-            {/* Acciones de Administrador */}
-            {user.role === 'admin' && (
-              <div style={{
-                marginTop: '24px',
-                padding: '16px',
-                border: '2px solid #007bff',
-                borderRadius: '8px',
-                backgroundColor: '#e3f2fd'
-              }}>
-                <h3 style={{ fontWeight: 'bold', marginBottom: '12px', color: '#007bff' }}>Acciones de Administrador</h3>
-                <button
-                  onClick={() => alert('Próximamente: Gestionar usuarios')}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#6f42c1',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  👥 Gestionar usuarios
-                </button>
-                <button
-                  onClick={() => alert('Próximamente: Generar reporte PDF')}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#17a2b8',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  📄 Generar reporte PDF
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Vista de detalle del elemento */}
-        {element && !scanning && (
-          <div>
-            <button
-              onClick={() => setElement(null)}
-              style={{
-                color: 'blue',
-                marginBottom: '16px',
-                cursor: 'pointer',
-                fontWeight: 'bold'
-              }}
-            >
-              ← Volver
-            </button>
-
-            {/* Botón de edición (solo para operador y admin) */}
-            {user.role !== 'lectura' && (
               <button
                 onClick={() => {
-                  const estado = prompt('Estado (Bueno, Regular, Malo)', element.estado) || element.estado;
-                  const enServicio = prompt('¿En servicio? (true/false)', element.en_servicio) === 'true';
-                  const ubicacionTipoRaw = prompt('Ubicación (Móvil o Depósito)', element.ubicacion_tipo) || '';
-                  let ubicacionTipo = '';
-                  let ubicacionId = element.ubicacion_id || '';
-                  let bauleraNumero = element.baulera_numero || '';
-                  let depositoNombre = element.deposito_nombre || '';
-
-                  if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('movil')) {
-                    ubicacionTipo = 'Móvil';
-                    ubicacionId = prompt('Número de móvil', ubicacionId) || ubicacionId;
-                    bauleraNumero = prompt('Baulera (opcional)', bauleraNumero) || bauleraNumero;
-                  } else if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('deposito')) {
-                    ubicacionTipo = 'Depósito';
-                    depositoNombre = prompt('Nombre del depósito', depositoNombre) || depositoNombre;
-                  } else {
-                    ubicacionTipo = '';
-                    ubicacionId = null;
-                    bauleraNumero = null;
-                    depositoNombre = null;
+                  const codigo = prompt('Código del elemento a editar (ej: MAT-001)');
+                  if (!codigo) return;
+                  const found = elementos[codigo.trim().toUpperCase()];
+                  if (!found) {
+                    alert('No encontrado');
+                    return;
                   }
 
-                  actualizarElemento(element.codigo_qr, {
+                  const estado = prompt('Estado', found.estado) || found.estado;
+                  const enServicio = prompt('¿En servicio?', found.en_servicio) === 'true';
+
+                  const ubicacionTipo = prompt('Ubicación', found.ubicacion_tipo) || '';
+                  const ubicacionId = ubicacionTipo ? prompt('ID', found.ubicacion_id || '') : '';
+                  const bauleraNumero = ubicacionTipo === 'Móvil' ? prompt('Baulera', found.baulera_numero || '') : '';
+                  const depositoNombre = ubicacionTipo === 'Depósito' ? prompt('Depósito', found.deposito_nombre || '') : '';
+
+                  actualizarElemento(found.codigo_qr, {
                     estado,
                     en_servicio,
                     ubicacion_tipo: ubicacionTipo || null,
@@ -354,54 +215,58 @@ function App() {
                   color: 'black',
                   border: 'none',
                   borderRadius: '4px',
-                  marginBottom: '16px',
+                  marginBottom: '8px',
                   cursor: 'pointer'
                 }}
               >
-                ✏️ Editar este elemento
+                ✏️ Editar elemento
               </button>
-            )}
-
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>{element.nombre}</h2>
-            {element.foto_url && (
-              <img
-                src={element.foto_url}
-                alt={element.nombre}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '200px',
-                  objectFit: 'contain',
-                  border: '1px solid #ddd',
-                  marginBottom: '16px'
-                }}
-              />
-            )}
-            <div style={{ lineHeight: '1.8' }}>
-              <p><strong>Tipo:</strong> {element.tipo}</p>
-              <p><strong>Estado:</strong> {element.estado}</p>
-              <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
-              <p><strong>Ubicación:</strong> 
-                {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
-                  ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
-                  : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
-              </p>
-              <p><strong>Última inspección:</strong> {element.ultima_inspeccion}</p>
-              <p><strong>Próxima:</strong> {element.proxima_inspeccion}</p>
-              <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
-        {/* Escáner de QR */}
-        {scanning && (
-          <QRScanner onScan={handleScan} onClose={() => setScanning(false)} />
-        )}
-      </div>
+      {element && (
+        <div>
+          <button
+            onClick={() => setElement(null)}
+            style={{ color: 'blue', cursor: 'pointer', fontWeight: 'bold', marginBottom: '16px' }}
+          >
+            ← Volver
+          </button>
+
+          <h2>{element.nombre}</h2>
+          {element.foto_url && (
+            <img
+              src={element.foto_url}
+              alt={element.nombre}
+              style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', border: '1px solid #ddd', marginBottom: '16px' }}
+            />
+          )}
+          <div style={{ lineHeight: '1.8' }}>
+            <p><strong>Tipo:</strong> {element.tipo}</p>
+            <p>
+              <strong>Estado:</strong>{' '}
+              <span style={{
+                color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red',
+                fontWeight: 'bold'
+              }}>{element.estado}</span>
+            </p>
+            <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
+            <p><strong>Ubicación:</strong> 
+              {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
+                ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
+                : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
+            </p>
+            <p><strong>Última inspección:</strong> {element.ultima_inspeccion || 'No registrada'}</p>
+            <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-// Componente de login
 function Login({ onLogin }) {
   const [legajo, setLegajo] = useState('');
   const [password, setPassword] = useState('');
@@ -412,79 +277,29 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#fee',
-      padding: '20px'
-    }}>
-      <div style={{
-        backgroundColor: 'white',
-        padding: '32px',
-        borderRadius: '12px',
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        width: '100%',
-        maxWidth: '400px'
-      }}>
-        <h2 style={{
-          fontSize: '1.8rem',
-          fontWeight: 'bold',
-          textAlign: 'center',
-          color: '#b91c1c',
-          marginBottom: '24px'
-        }}>
-          BomberoStock
-        </h2>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', backgroundColor: '#fee' }}>
+      <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)', width: '100%', maxWidth: '400px' }}>
+        <h2 style={{ textAlign: 'center', color: '#b91c1c', marginBottom: '24px' }}>BomberoStock</h2>
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '16px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              color: '#333',
-              marginBottom: '8px'
-            }}>
-              Legajo (3 dígitos)
-            </label>
+            <label style={{ display: 'block', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>Legajo</label>
             <input
               type="text"
               maxLength="3"
               value={legajo}
               onChange={(e) => setLegajo(e.target.value)}
               required
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
+              style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px' }}
             />
           </div>
           <div style={{ marginBottom: '24px' }}>
-            <label style={{
-              display: 'block',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              color: '#333',
-              marginBottom: '8px'
-            }}>
-              Contraseña
-            </label>
+            <label style={{ display: 'block', fontWeight: 'bold', color: '#333', marginBottom: '8px' }}>Contraseña</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
+              style={{ width: '100%', padding: '10px', border: '1px solid #ccc', borderRadius: '6px' }}
             />
           </div>
           <button
@@ -496,20 +311,13 @@ function Login({ onLogin }) {
               color: 'white',
               border: 'none',
               borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
+              fontWeight: 'bold'
             }}
           >
             Ingresar
           </button>
         </form>
-        <p style={{
-          textAlign: 'center',
-          fontSize: '12px',
-          color: '#666',
-          marginTop: '16px'
-        }}>
+        <p style={{ textAlign: 'center', fontSize: '12px', color: '#666', marginTop: '16px' }}>
           Pruebas: 001/bombero, 100/operador, 999/admin
         </p>
       </div>
