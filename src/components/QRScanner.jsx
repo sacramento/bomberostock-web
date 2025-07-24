@@ -16,7 +16,7 @@ export default function QRScanner({ onScan, onClose }) {
 
   const startCamera = async () => {
     try {
-      const constraints = { video: { facingMode: 'environment' } }; // cámara trasera
+      const constraints = { video: { facingMode: 'environment' } };
       const mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
       setStream(mediaStream);
       if (videoRef.current) {
@@ -40,8 +40,6 @@ export default function QRScanner({ onScan, onClose }) {
     const image = new Image();
     image.src = canvas.toDataURL('image/png');
 
-    // Simulamos lectura de QR (en producción usarías una librería como jsQR)
-    // Por ahora, pedimos al usuario que confirme el código
     const code = prompt('Código QR detectado (ingresalo manualmente por ahora):', '');
     if (code) {
       onScan(code.trim());

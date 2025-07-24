@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import QRScanner from './components/QRScanner.jsx';
+import FormularioCarga from './components/FormularioCarga.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -8,6 +9,8 @@ function App() {
   const [element, setElement] = useState(null);
   const [scanning, setScanning] = useState(false);
   const [elementos, setElementos] = useState({});
+  const [viewingList, setViewingList] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
   // Cargar elementos desde Supabase
   useEffect(() => {
@@ -18,7 +21,7 @@ function App() {
 
       if (error) {
         console.error('Error al cargar elementos:', error);
-        alert('No se pudo conectar a la base de datos. Revisá la conexión.');
+        alert('No se pudo conectar a la base de datos.');
       } else {
         const elementosMap = {};
         data.forEach(el => {
@@ -31,7 +34,7 @@ function App() {
     cargarElementos();
   }, []);
 
-  // Función para crear un nuevo elemento
+  // Crear nuevo elemento
   const crearElemento = async (nuevoElemento) => {
     const { data, error } = await supabase
       .from('elementos')
@@ -41,7 +44,7 @@ function App() {
       alert('Error al crear: ' + error.message);
     } else {
       alert('✅ Elemento creado con éxito');
-      // Recargar lista
+      // Recargar
       const {  nuevos } = await supabase.from('elementos').select('*');
       const map = {};
       nuevos.forEach(el => {
@@ -51,7 +54,7 @@ function App() {
     }
   };
 
-  // Función para actualizar un elemento
+  // Actualizar elemento
   const actualizarElemento = async (codigo_qr, cambios) => {
     const { error } = await supabase
       .from('elementos')
@@ -62,7 +65,6 @@ function App() {
       alert('Error al actualizar: ' + error.message);
     } else {
       alert('✅ Elemento actualizado');
-      // Recargar lista
       const {  nuevos } = await supabase.from('elementos').select('*');
       const map = {};
       nuevos.forEach(el => {
@@ -140,7 +142,7 @@ function App() {
           </button>
         </div>
 
-        {!element && !scanning && (
+        {!element && !scanning && !mostrarFormulario && !viewingList && (
           <div>
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>Buscar elemento</h2>
             <div style={{ marginBottom: '16px' }}>
@@ -184,55 +186,7 @@ function App() {
               }}>
                 <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Acciones de Operador</h3>
                 <button
-                  onClick={() => {
-                    const codigo = prompt('Código QR (ej: MAT-001)');
-                    if (!codigo) return;
-                    const nombre = prompt('Nombre del elemento');
-                    if (!nombre) return;
-                    const tipo = prompt('Tipo (ej: Manga, Lanza, Cizalla)');
-                    if (!tipo) return;
-
-                    const estado = prompt('Estado (Bueno, Regular, Malo)', 'Bueno') || 'Bueno';
-                    const enServicio = prompt('¿En servicio? (true/false)', 'true') === 'true';
-                    const ultimaInspeccion = prompt('Última inspección (AAAA-MM-DD)', new Date().toISOString().split('T')[0]);
-
-                    const ubicacionTipoRaw = prompt('Ubicación (Móvil o Depósito)', '').trim();
-                    let ubicacionTipo = '';
-                    let ubicacionId = '';
-                    let bauleraNumero = '';
-                    let depositoNombre = '';
-
-                    if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('movil')) {
-                      ubicacionTipo = 'Móvil';
-                      ubicacionId = prompt('Número de móvil (ej: 3)', '') || '';
-                      bauleraNumero = prompt('Número de baulera (opcional)', '') || '';
-                    } else if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('deposito')) {
-                      ubicacionTipo = 'Depósito';
-                      depositoNombre = prompt('Nombre del depósito (Depósito 1 o Depósito 2)', '') || '';
-                    }
-
-                    const caracteristicas = prompt('Características (opcional)', '') || null;
-                    const proximaInspeccion = prompt('Próxima inspección (AAAA-MM-DD, opcional)', '') || null;
-                    const vencimiento = prompt('Vencimiento (AAAA-MM-DD, opcional)', '') || null;
-                    const fotoUrl = prompt('URL de la foto (opcional)', '') || null;
-
-                    crearElemento({
-                      codigo_qr: codigo.trim().toUpperCase(),
-                      nombre,
-                      tipo,
-                      estado,
-                      en_servicio: enServicio,
-                      ultima_inspeccion: ultimaInspeccion || null,
-                      proxima_inspeccion: proximaInspeccion === '' ? null : proximaInspeccion,
-                      vencimiento: vencimiento === '' ? null : vencimiento,
-                      caracteristicas,
-                      foto_url: fotoUrl,
-                      ubicacion_tipo: ubicacionTipo || null,
-                      ubicacion_id: ubicacionId || null,
-                      baulera_numero: bauleraNumero || null,
-                      deposito_nombre: depositoNombre || null
-                    });
-                  }}
+                  onClick={() => setMostrarFormulario(true)}
                   style={{
                     display: 'block',
                     width: '100%',
@@ -246,6 +200,21 @@ function App() {
                   }}
                 >
                   + Cargar elemento nuevo
+                </button>
+
+                <button
+                  onClick={() => setViewingList(!viewingList)}
+                  style={{
+                    width: '100%',
+                    padding: '10px',
+                    backgroundColor: '#17a2b8',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {viewingList ? '← Ocultar listado' : '📋 Ver todos los elementos'}
                 </button>
               </div>
             )}
@@ -296,8 +265,65 @@ function App() {
           </div>
         )}
 
+        {/* Formulario de carga */}
+        {mostrarFormulario && (
+          <FormularioCarga
+            onClose={() => setMostrarFormulario(false)}
+            onCreate={(nuevo) => {
+              crearElemento(nuevo);
+              setMostrarFormulario(false);
+            }}
+          />
+        )}
+
+        {/* Listado de elementos */}
+        {viewingList && (
+          <div style={{
+            marginTop: '24px',
+            padding: '16px',
+            backgroundColor: 'white',
+            borderRadius: '8px',
+            border: '1px solid #ddd'
+          }}>
+            <h3 style={{ marginBottom: '16px', textAlign: 'center', color: '#333' }}>
+              Todos los elementos ({Object.keys(elementos).length})
+            </h3>
+            <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+              {Object.values(elementos)
+                .sort((a, b) => a.nombre.localeCompare(b.nombre))
+                .map(el => (
+                  <div key={el.codigo_qr} style={{
+                    padding: '12px',
+                    borderBottom: '1px solid #eee',
+                    cursor: 'pointer',
+                    backgroundColor: element?.codigo_qr === el.codigo_qr ? '#f0f8ff' : 'white'
+                  }}
+                  onClick={() => {
+                    setElement(el);
+                    setViewingList(false);
+                  }}
+                  >
+                    <strong>{el.codigo_qr}</strong>: {el.nombre} | {el.tipo}
+                    <br />
+                    <small>
+                      Ubicación: {el.ubicacion_tipo === 'Móvil' 
+                        ? `Móvil ${el.ubicacion_id} Baulera ${el.baulera_numero || ''}` 
+                        : el.deposito_nombre || 'Sin asignar'}
+                      {' '}•{' '}
+                      Estado: 
+                      <span style={{
+                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                        fontWeight: 'bold'
+                      }}> {el.estado}</span>
+                    </small>
+                  </div>
+                ))}
+            </div>
+          </div>
+        )}
+
         {/* Vista de detalle del elemento */}
-        {element && !scanning && (
+        {element && !scanning && !mostrarFormulario && !viewingList && (
           <div>
             <button
               onClick={() => setElement(null)}
@@ -311,7 +337,7 @@ function App() {
               ← Volver
             </button>
 
-            {/* Botón de edición (solo para operador y admin) */}
+            {/* Botón de edición */}
             {user.role !== 'lectura' && (
               <button
                 onClick={() => {
@@ -378,15 +404,25 @@ function App() {
             )}
             <div style={{ lineHeight: '1.8' }}>
               <p><strong>Tipo:</strong> {element.tipo}</p>
-              <p><strong>Estado:</strong> {element.estado}</p>
+              <p>
+                <strong>Estado:</strong>{' '}
+                <span style={{
+                  color: element.estado === 'Bueno' ? 'green' :
+                         element.estado === 'Regular' ? 'orange' : 'red',
+                  fontWeight: 'bold'
+                }}>
+                  {element.estado}
+                </span>
+              </p>
               <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
               <p><strong>Ubicación:</strong> 
                 {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
                   ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
                   : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
               </p>
-              <p><strong>Última inspección:</strong> {element.ultima_inspeccion}</p>
-              <p><strong>Próxima:</strong> {element.proxima_inspeccion}</p>
+              <p><strong>Última inspección:</strong> {element.ultima_inspeccion || 'No registrada'}</p>
+              <p><strong>Próxima inspección:</strong> {element.proxima_inspeccion || 'No programada'}</p>
+              <p><strong>Vencimiento:</strong> {element.vencimiento || 'No aplica'}</p>
               <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
             </div>
           </div>
