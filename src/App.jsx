@@ -42,7 +42,7 @@ function App() {
     } else {
       alert('✅ Elemento creado con éxito');
       // Recargar lista
-      const { data: nuevos } = await supabase.from('elementos').select('*');
+      const {  nuevos } = await supabase.from('elementos').select('*');
       const map = {};
       nuevos.forEach(el => {
         map[el.codigo_qr] = el;
@@ -63,7 +63,7 @@ function App() {
     } else {
       alert('✅ Elemento actualizado');
       // Recargar lista
-      const { data: nuevos } = await supabase.from('elementos').select('*');
+      const {  nuevos } = await supabase.from('elementos').select('*');
       const map = {};
       nuevos.forEach(el => {
         map[el.codigo_qr] = el;
@@ -190,14 +190,47 @@ function App() {
                     const nombre = prompt('Nombre del elemento');
                     if (!nombre) return;
                     const tipo = prompt('Tipo (ej: Manga, Lanza, Cizalla)');
-                    
+                    if (!tipo) return;
+
+                    const estado = prompt('Estado (Bueno, Regular, Malo)', 'Bueno') || 'Bueno';
+                    const enServicio = prompt('¿En servicio? (true/false)', 'true') === 'true';
+                    const ultimaInspeccion = prompt('Última inspección (AAAA-MM-DD)', new Date().toISOString().split('T')[0]);
+
+                    const ubicacionTipoRaw = prompt('Ubicación (Móvil o Depósito)', '').trim();
+                    let ubicacionTipo = '';
+                    let ubicacionId = '';
+                    let bauleraNumero = '';
+                    let depositoNombre = '';
+
+                    if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('movil')) {
+                      ubicacionTipo = 'Móvil';
+                      ubicacionId = prompt('Número de móvil (ej: 3)', '') || '';
+                      bauleraNumero = prompt('Número de baulera (opcional)', '') || '';
+                    } else if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('deposito')) {
+                      ubicacionTipo = 'Depósito';
+                      depositoNombre = prompt('Nombre del depósito (Depósito 1 o Depósito 2)', '') || '';
+                    }
+
+                    const caracteristicas = prompt('Características (opcional)', '') || null;
+                    const proximaInspeccion = prompt('Próxima inspección (AAAA-MM-DD, opcional)', '') || null;
+                    const vencimiento = prompt('Vencimiento (AAAA-MM-DD, opcional)', '') || null;
+                    const fotoUrl = prompt('URL de la foto (opcional)', '') || null;
+
                     crearElemento({
                       codigo_qr: codigo.trim().toUpperCase(),
                       nombre,
-                      tipo: tipo || 'Sin tipo',
-                      estado: 'Bueno',
-                      en_servicio: true,
-                      ultima_inspeccion: new Date().toISOString().split('T')[0]
+                      tipo,
+                      estado,
+                      en_servicio: enServicio,
+                      ultima_inspeccion: ultimaInspeccion || null,
+                      proxima_inspeccion: proximaInspeccion === '' ? null : proximaInspeccion,
+                      vencimiento: vencimiento === '' ? null : vencimiento,
+                      caracteristicas,
+                      foto_url: fotoUrl,
+                      ubicacion_tipo: ubicacionTipo || null,
+                      ubicacion_id: ubicacionId || null,
+                      baulera_numero: bauleraNumero || null,
+                      deposito_nombre: depositoNombre || null
                     });
                   }}
                   style={{
@@ -284,18 +317,33 @@ function App() {
                 onClick={() => {
                   const estado = prompt('Estado (Bueno, Regular, Malo)', element.estado) || element.estado;
                   const enServicio = prompt('¿En servicio? (true/false)', element.en_servicio) === 'true';
-                  const ubicacionTipo = prompt('Ubicación (Móvil o Depósito)', element.ubicacion_tipo) || element.ubicacion_tipo;
-                  const ubicacionId = prompt('ID de ubicación (ej: 5)', element.ubicacion_id || '') || null;
-                  const baulera = prompt('Baulera (si aplica)', element.baulera_numero || '') || null;
-                  const deposito = prompt('Depósito (si aplica)', element.deposito_nombre || '') || null;
+                  const ubicacionTipoRaw = prompt('Ubicación (Móvil o Depósito)', element.ubicacion_tipo) || '';
+                  let ubicacionTipo = '';
+                  let ubicacionId = element.ubicacion_id || '';
+                  let bauleraNumero = element.baulera_numero || '';
+                  let depositoNombre = element.deposito_nombre || '';
+
+                  if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('movil')) {
+                    ubicacionTipo = 'Móvil';
+                    ubicacionId = prompt('Número de móvil', ubicacionId) || ubicacionId;
+                    bauleraNumero = prompt('Baulera (opcional)', bauleraNumero) || bauleraNumero;
+                  } else if (ubicacionTipoRaw && ubicacionTipoRaw.toLowerCase().includes('deposito')) {
+                    ubicacionTipo = 'Depósito';
+                    depositoNombre = prompt('Nombre del depósito', depositoNombre) || depositoNombre;
+                  } else {
+                    ubicacionTipo = '';
+                    ubicacionId = null;
+                    bauleraNumero = null;
+                    depositoNombre = null;
+                  }
 
                   actualizarElemento(element.codigo_qr, {
                     estado,
                     en_servicio,
-                    ubicacion_tipo,
-                    ubicacion_id: ubicacionId,
-                    baulera_numero: baulera,
-                    deposito_nombre: deposito
+                    ubicacion_tipo: ubicacionTipo || null,
+                    ubicacion_id: ubicacionId || null,
+                    baulera_numero: bauleraNumero || null,
+                    deposito_nombre: depositoNombre || null
                   });
                 }}
                 style={{
