@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+// src/components/QRScanner.jsx
+import { useState } from 'react';
 import QrScanner from 'react-qr-scanner';
 
 export default function QRScanner({ onScan, onClose }) {
   const [error, setError] = useState('');
 
   const handleError = (err) => {
-    console.error(err);
-    setError('Error al acceder a la cámara: ' + (err.message || 'Desconocido'));
+    console.error('Error de escáner:', err);
+    setError('No se pudo acceder a la cámara. ¿Permisos?');
   };
 
   const handleScan = (data) => {
@@ -32,7 +33,7 @@ export default function QRScanner({ onScan, onClose }) {
       textAlign: 'center',
       padding: '20px'
     }}>
-      <h2 style={{ marginBottom: '20px' }}>Escanear QR</h2>
+      <h2>Escanear QR</h2>
 
       {error ? (
         <div>
@@ -56,10 +57,9 @@ export default function QRScanner({ onScan, onClose }) {
         <div style={{ width: '100%', maxWidth: '400px' }}>
           <QrScanner
             style={{ width: '100%' }}
-            onError={handleError}
             onScan={handleScan}
+            onError={handleError}
             facingMode="environment"
-            legacyMode={false}
           />
           <p style={{ marginTop: '16px' }}>Apunta al código QR</p>
         </div>

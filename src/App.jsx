@@ -186,21 +186,21 @@ function App() {
               }}>
                 <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Acciones de Operador</h3>
                 <button
-                  onClick={() => setMostrarFormulario(true)}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  + Cargar elemento nuevo
-                </button>
+  onClick={() => setMostrarFormulario(true)}
+  style={{
+    display: 'block',
+    width: '100%',
+    padding: '10px',
+    backgroundColor: '#28a745',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    marginBottom: '8px',
+    cursor: 'pointer'
+  }}
+>
+  + Cargar elemento nuevo
+</button>
 
                 <button
                   onClick={() => setViewingList(!viewingList)}
@@ -267,14 +267,14 @@ function App() {
 
         {/* Formulario de carga */}
         {mostrarFormulario && (
-          <FormularioCarga
-            onClose={() => setMostrarFormulario(false)}
-            onCreate={(nuevo) => {
-              crearElemento(nuevo);
-              setMostrarFormulario(false);
-            }}
-          />
-        )}
+  <FormularioCarga
+    onClose={() => setMostrarFormulario(false)}
+    onCreate={(nuevo) => {
+      crearElemento(nuevo);
+      setMostrarFormulario(false);
+    }}
+  />
+)}
 
         {/* Listado de elementos */}
         {viewingList && (
@@ -334,7 +334,7 @@ function App() {
                 fontWeight: 'bold'
               }}
             >
-              ← Volver
+              ← 
             </button>
 
             {/* Botón de edición */}
