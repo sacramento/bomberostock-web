@@ -181,7 +181,8 @@ function App() {
               if (!nombre) return;
               const tipo = prompt('Tipo (ej: Manga, Lanza)');
               const estado = prompt('Estado (Bueno, Regular, Malo)', 'Bueno');
-              const enServicio = confirm('¿Está en servicio?');
+              const enServicioInput = prompt('¿En servicio? (sí/no)', 'sí');
+              const enServicio = enServicioInput && enServicioInput.toLowerCase().trim() === 'sí';
 
               const ubicacionTipo = prompt('Ubicación (Móvil o Depósito)', '').trim();
               let ubicacionId = '';
@@ -294,7 +295,10 @@ function App() {
             <button
               onClick={() => {
                 const estado = prompt('Estado', element.estado) || element.estado;
-                const enServicio = confirm('¿En servicio?') === true;
+                const enServicioInput = prompt('¿En servicio? (sí/no)', element.en_servicio ? 'sí' : 'no');
+                const enServicio = enServicioInput === null 
+                 ? element.en_servicio 
+                 : enServicioInput.toLowerCase().trim() === 'sí';
 
                 const ubicacionTipo = prompt('Ubicación', element.ubicacion_tipo) || '';
                 let ubicacionId = '';
