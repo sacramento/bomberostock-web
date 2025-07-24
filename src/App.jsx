@@ -7,9 +7,9 @@ function App() {
   const [searchCode, setSearchCode] = useState('');
   const [element, setElement] = useState(null);
   const [scanning, setScanning] = useState(false);
-  const [elementos, setElementos] = useState({}); // Almacena elementos desde Supabase
+  const [elementos, setElementos] = useState({});
 
-  // Cargar elementos desde Supabase al iniciar
+  // Cargar elementos desde Supabase
   useEffect(() => {
     const cargarElementos = async () => {
       const { data, error } = await supabase
@@ -18,7 +18,7 @@ function App() {
 
       if (error) {
         console.error('Error al cargar elementos:', error);
-        alert('No se pudo conectar a la base de datos. Revisá la conexión o contactá al admin.');
+        alert('No se pudo conectar a la base de datos. Revisá la conexión.');
       } else {
         const elementosMap = {};
         data.forEach(el => {
@@ -30,6 +30,47 @@ function App() {
 
     cargarElementos();
   }, []);
+
+  // Función para crear un nuevo elemento
+  const crearElemento = async (nuevoElemento) => {
+    const { data, error } = await supabase
+      .from('elementos')
+      .insert([nuevoElemento]);
+
+    if (error) {
+      alert('Error al crear: ' + error.message);
+    } else {
+      alert('✅ Elemento creado con éxito');
+      // Recargar lista
+      const { data: nuevos } = await supabase.from('elementos').select('*');
+      const map = {};
+      nuevos.forEach(el => {
+        map[el.codigo_qr] = el;
+      });
+      setElementos(map);
+    }
+  };
+
+  // Función para actualizar un elemento
+  const actualizarElemento = async (codigo_qr, cambios) => {
+    const { error } = await supabase
+      .from('elementos')
+      .update(cambios)
+      .eq('codigo_qr', codigo_qr);
+
+    if (error) {
+      alert('Error al actualizar: ' + error.message);
+    } else {
+      alert('✅ Elemento actualizado');
+      // Recargar lista
+      const { data: nuevos } = await supabase.from('elementos').select('*');
+      const map = {};
+      nuevos.forEach(el => {
+        map[el.codigo_qr] = el;
+      });
+      setElementos(map);
+    }
+  };
 
   const handleLogin = (legajo, password) => {
     if (legajo === '001' && password === 'bombero') {
@@ -49,11 +90,10 @@ function App() {
     if (found) {
       setElement(found);
     } else {
-      alert(`Elemento "${code}" no encontrado en el inventario`);
+      alert(`Elemento "${code}" no encontrado`);
     }
   };
 
-  // Cuando se escanea un QR
   const handleScan = (code) => {
     const cleanedCode = code.trim().toUpperCase();
     setSearchCode(cleanedCode);
@@ -62,7 +102,7 @@ function App() {
     if (found) {
       setElement(found);
     } else {
-      alert(`Elemento "${cleanedCode}" no encontrado en el inventario`);
+      alert(`Elemento "${cleanedCode}" no encontrado`);
     }
   };
 
@@ -72,14 +112,14 @@ function App() {
 
   return (
     <div className="min-h-screen">
-      <header className="bg-red-700 text-white p-4">
-        <div className="container mx-auto">
-          <h1 className="text-xl font-bold">BomberoStock</h1>
+      <header style={{ backgroundColor: '#b91c1c', color: 'white', padding: '16px' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>BomberoStock</h1>
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
       </header>
 
-      <div className="container mx-auto p-4">
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '16px' }}>
         {/* Botón de escaneo */}
         <div style={{ marginTop: '16px', marginBottom: '24px' }}>
           <button
@@ -100,10 +140,9 @@ function App() {
           </button>
         </div>
 
-        {/* Vista de búsqueda */}
         {!element && !scanning && (
           <div>
-            <h2 className="text-2xl font-bold mb-4">Buscar elemento</h2>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>Buscar elemento</h2>
             <div style={{ marginBottom: '16px' }}>
               <input
                 type="text"
@@ -136,10 +175,31 @@ function App() {
 
             {/* Acciones de Operador */}
             {(user.role === 'operador' || user.role === 'admin') && (
-              <div style={{ marginTop: '24px', padding: '16px', border: '1px solid #ccc', borderRadius: '8px' }}>
+              <div style={{
+                marginTop: '24px',
+                padding: '16px',
+                border: '1px solid #ccc',
+                borderRadius: '8px',
+                backgroundColor: '#f8f9fa'
+              }}>
                 <h3 style={{ fontWeight: 'bold', marginBottom: '12px' }}>Acciones de Operador</h3>
                 <button
-                  onClick={() => alert('Próximamente: Cargar nuevo elemento')}
+                  onClick={() => {
+                    const codigo = prompt('Código QR (ej: MAT-001)');
+                    if (!codigo) return;
+                    const nombre = prompt('Nombre del elemento');
+                    if (!nombre) return;
+                    const tipo = prompt('Tipo (ej: Manga, Lanza, Cizalla)');
+                    
+                    crearElemento({
+                      codigo_qr: codigo.trim().toUpperCase(),
+                      nombre,
+                      tipo: tipo || 'Sin tipo',
+                      estado: 'Bueno',
+                      en_servicio: true,
+                      ultima_inspeccion: new Date().toISOString().split('T')[0]
+                    });
+                  }}
                   style={{
                     display: 'block',
                     width: '100%',
@@ -154,43 +214,18 @@ function App() {
                 >
                   + Cargar elemento nuevo
                 </button>
-                <button
-                  onClick={() => alert('Próximamente: Editar ubicación')}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#ffc107',
-                    color: 'black',
-                    border: 'none',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✏️ Editar elemento
-                </button>
-                <button
-                  onClick={() => alert('Próximamente: Dar de baja')}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  🗑️ Dar de baja
-                </button>
               </div>
             )}
 
             {/* Acciones de Administrador */}
             {user.role === 'admin' && (
-              <div style={{ marginTop: '24px', padding: '16px', border: '2px solid #007bff', borderRadius: '8px' }}>
+              <div style={{
+                marginTop: '24px',
+                padding: '16px',
+                border: '2px solid #007bff',
+                borderRadius: '8px',
+                backgroundColor: '#e3f2fd'
+              }}>
                 <h3 style={{ fontWeight: 'bold', marginBottom: '12px', color: '#007bff' }}>Acciones de Administrador</h3>
                 <button
                   onClick={() => alert('Próximamente: Gestionar usuarios')}
@@ -207,22 +242,6 @@ function App() {
                   }}
                 >
                   👥 Gestionar usuarios
-                </button>
-                <button
-                  onClick={() => alert('Próximamente: Agregar móvil')}
-                  style={{
-                    display: 'block',
-                    width: '100%',
-                    padding: '10px',
-                    backgroundColor: '#fd7e14',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    marginBottom: '8px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  🚗 Agregar móvil
                 </button>
                 <button
                   onClick={() => alert('Próximamente: Generar reporte PDF')}
@@ -258,6 +277,43 @@ function App() {
             >
               ← Volver
             </button>
+
+            {/* Botón de edición (solo para operador y admin) */}
+            {user.role !== 'lectura' && (
+              <button
+                onClick={() => {
+                  const estado = prompt('Estado (Bueno, Regular, Malo)', element.estado) || element.estado;
+                  const enServicio = prompt('¿En servicio? (true/false)', element.en_servicio) === 'true';
+                  const ubicacionTipo = prompt('Ubicación (Móvil o Depósito)', element.ubicacion_tipo) || element.ubicacion_tipo;
+                  const ubicacionId = prompt('ID de ubicación (ej: 5)', element.ubicacion_id || '') || null;
+                  const baulera = prompt('Baulera (si aplica)', element.baulera_numero || '') || null;
+                  const deposito = prompt('Depósito (si aplica)', element.deposito_nombre || '') || null;
+
+                  actualizarElemento(element.codigo_qr, {
+                    estado,
+                    en_servicio,
+                    ubicacion_tipo,
+                    ubicacion_id: ubicacionId,
+                    baulera_numero: baulera,
+                    deposito_nombre: deposito
+                  });
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '10px',
+                  backgroundColor: '#ffc107',
+                  color: 'black',
+                  border: 'none',
+                  borderRadius: '4px',
+                  marginBottom: '16px',
+                  cursor: 'pointer'
+                }}
+              >
+                ✏️ Editar este elemento
+              </button>
+            )}
+
             <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '16px' }}>{element.nombre}</h2>
             {element.foto_url && (
               <img
@@ -277,13 +333,13 @@ function App() {
               <p><strong>Estado:</strong> {element.estado}</p>
               <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
               <p><strong>Ubicación:</strong> 
-                {element.ubicacion_tipo === 'Móvil'
-                  ? `Móvil ${element.ubicacion_id}, Baulera ${element.baulera_numero}`
+                {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
+                  ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
                   : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
               </p>
               <p><strong>Última inspección:</strong> {element.ultima_inspeccion}</p>
               <p><strong>Próxima:</strong> {element.proxima_inspeccion}</p>
-              <p><strong>Características:</strong> {element.caracteristicas}</p>
+              <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
             </div>
           </div>
         )}
@@ -308,39 +364,104 @@ function Login({ onLogin }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-red-50">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold text-center text-red-700 mb-6">BomberoStock</h2>
+    <div style={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#fee',
+      padding: '20px'
+    }}>
+      <div style={{
+        backgroundColor: 'white',
+        padding: '32px',
+        borderRadius: '12px',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        width: '100%',
+        maxWidth: '400px'
+      }}>
+        <h2 style={{
+          fontSize: '1.8rem',
+          fontWeight: 'bold',
+          textAlign: 'center',
+          color: '#b91c1c',
+          marginBottom: '24px'
+        }}>
+          BomberoStock
+        </h2>
         <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Legajo (3 dígitos)</label>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#333',
+              marginBottom: '8px'
+            }}>
+              Legajo (3 dígitos)
+            </label>
             <input
               type="text"
               maxLength="3"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
               value={legajo}
               onChange={(e) => setLegajo(e.target.value)}
               required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
             />
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-bold mb-2">Contraseña</label>
+          <div style={{ marginBottom: '24px' }}>
+            <label style={{
+              display: 'block',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: '#333',
+              marginBottom: '8px'
+            }}>
+              Contraseña
+            </label>
             <input
               type="password"
-              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded focus:outline-none"
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: '#b91c1c',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
           >
             Ingresar
           </button>
         </form>
-        <p className="text-center text-gray-500 text-xs mt-4">
+        <p style={{
+          textAlign: 'center',
+          fontSize: '12px',
+          color: '#666',
+          marginTop: '16px'
+        }}>
           Pruebas: 001/bombero, 100/operador, 999/admin
         </p>
       </div>
