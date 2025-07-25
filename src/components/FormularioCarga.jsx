@@ -253,6 +253,26 @@ export default function FormularioCarga({ onClose, onCreate }) {
             </div>
           )}
 
+          {/* Características */}
+<div style={{ marginBottom: '16px' }}>
+  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
+  <textarea
+    name="caracteristicas"
+    value={form.caracteristicas}
+    onChange={handleChange}
+    rows="3"
+    placeholder="Ej: 20 metros, caucho reforzado, conexión rápida"
+    style={{
+      width: '100%',
+      padding: '12px',
+      border: '1px solid #ccc',
+      borderRadius: '6px',
+      fontSize: '16px',
+      resize: 'vertical'
+    }}
+  />
+</div>
+
           {/* Botones */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
             <button
