@@ -11,7 +11,8 @@ export default function FormularioCarga({ onClose, onCreate }) {
     ubicacion_tipo: '',
     ubicacion_id: '',
     baulera_numero: '',
-    deposito_nombre: ''
+    deposito_nombre: '',
+    caracteristicas: ''
   });
 
   const handleChange = (e) => {
@@ -32,18 +33,21 @@ export default function FormularioCarga({ onClose, onCreate }) {
     }
 
     // Datos a guardar
-    const data = {
-      codigo_qr: form.codigo_qr.trim().toUpperCase(),
-      nombre: form.nombre.trim(),
-      tipo: form.tipo.trim(),
-      estado: form.estado,
-      en_servicio: form.en_servicio,
-      ubicacion_tipo: form.ubicacion_tipo || null,
-      ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
-      baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
-      deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
-      ultima_inspeccion: new Date().toISOString().split('T')[0]
-    };
+   const data = {
+  codigo_qr: form.codigo_qr.trim().toUpperCase(),
+  nombre: form.nombre.trim(),
+  tipo: form.tipo.trim(),
+  estado: form.estado,
+  en_servicio: form.en_servicio,
+  ubicacion_tipo: form.ubicacion_tipo || null,
+  ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
+  baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
+  deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
+  caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,  // ✅ Agregado
+  ultima_inspeccion: new Date().toISOString().split('T')[0]
+};
+
+console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
 
     onCreate(data);
   };
