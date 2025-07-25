@@ -25,6 +25,8 @@ function App() {
       }
     };
     cargarElementos();
+    // Exponer supabase temporalmente en la consola
+window.supabase = supabase;
   }, []);
 
   // Crear nuevo elemento
