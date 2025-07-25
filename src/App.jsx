@@ -8,8 +8,9 @@ function App() {
   const [elementos, setElementos] = useState({});
   const [usuarios, setUsuarios] = useState([]);
   const [viendoUsuarios, setViendoUsuarios] = useState(false);
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
 
-  // Cargar elementos desde Supabase
+  // Cargar elementos
   useEffect(() => {
     const cargarElementos = async () => {
       const { data, error } = await supabase.from('elementos').select('*');
@@ -216,7 +217,155 @@ function App() {
           </button>
         </div>
 
-        {/* Acciones de Administrador */}
+        {/* ✅ CARGA DE ELEMENTOS (Operador y Admin) */}
+        {(user.role === 'operador' || user.role === 'admin') && !viendoUsuarios && !element && !mostrarFormulario && (
+          <div className="card">
+            <h3>➕ Cargar nuevo elemento</h3>
+            <button
+              onClick={() => setMostrarFormulario(true)}
+              className="btn"
+              style={{ backgroundColor: '#28a745', color: 'white' }}
+            >
+              + Cargar elemento nuevo
+            </button>
+          </div>
+        )}
+
+        {/* ✅ FORMULARIO DE CARGA */}
+        {mostrarFormulario && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              width: '100%',
+              maxWidth: '500px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
+            }}>
+              <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+                <h2 style={{ margin: 0, color: '#333' }}>Cargar Nuevo Elemento</h2>
+              </div>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                const formData = new FormData(e.target);
+                const data = Object.fromEntries(formData);
+
+                const ubicacion_tipo = data.ubicacion_tipo;
+                let ubicacion_id = null;
+                let baulera_numero = null;
+                let deposito_nombre = null;
+
+                if (ubicacion_tipo === 'Móvil') {
+                  ubicacion_id = data.ubicacion_id;
+                  baulera_numero = data.baulera_numero;
+                } else if (ubicacion_tipo === 'Depósito') {
+                  deposito_nombre = data.deposito_nombre;
+                }
+
+                crearElemento({
+                  codigo_qr: data.codigo_qr.trim().toUpperCase(),
+                  nombre: data.nombre.trim(),
+                  tipo: data.tipo.trim(),
+                  estado: data.estado,
+                  en_servicio: data.en_servicio === 'on',
+                  ubicacion_tipo: ubicacion_tipo || null,
+                  ubicacion_id: ubicacion_id,
+                  baulera_numero: baulera_numero,
+                  deposito_nombre: deposito_nombre,
+                  caracteristicas: data.caracteristicas || null,
+                  ultima_inspeccion: new Date().toISOString().split('T')[0]
+                });
+                setMostrarFormulario(false);
+              }} style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Código QR *</label>
+                  <input name="codigo_qr" required style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre *</label>
+                  <input name="nombre" required style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Tipo *</label>
+                  <input name="tipo" required style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Estado</label>
+                  <select name="estado" style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }}>
+                    <option value="Bueno">Bueno</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Malo">Malo</option>
+                  </select>
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>¿En servicio?</label>
+                  <input type="checkbox" name="en_servicio" style={{ marginRight: '8px', transform: 'scale(1.4)' }} />
+                  <span>Sí</span>
+                </div>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Ubicación</label>
+                  <select name="ubicacion_tipo" style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }}>
+                    <option value="">Seleccionar...</option>
+                    <option value="Móvil">Móvil</option>
+                    <option value="Depósito">Depósito</option>
+                  </select>
+                </div>
+                {/*
+                  Este bloque se maneja en el submit
+                */}
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
+                  <textarea name="caracteristicas" rows="3" style={{ width: '100%', padding: '12px', border: '1px solid #ccc', borderRadius: '6px' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+                  <button type="submit" style={{
+                    flex: 1,
+                    padding: '14px',
+                    backgroundColor: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '16px',
+                    fontWeight: 'bold'
+                  }}>
+                    Guardar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setMostrarFormulario(false)}
+                    style={{
+                      flex: 1,
+                      padding: '14px',
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '16px',
+                      fontWeight: 'bold'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ✅ GESTIÓN DE USUARIOS (solo Admin) */}
         {user.role === 'admin' && (
           <div className="card">
             <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
@@ -392,7 +541,7 @@ function App() {
         )}
 
         {/* Ficha del elemento */}
-        {element && !viendoUsuarios && (
+        {element && !viendoUsuarios && !mostrarFormulario && (
           <div className="card">
             <button
               onClick={() => setElement(null)}
