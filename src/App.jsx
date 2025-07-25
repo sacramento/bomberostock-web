@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
+import FormularioCarga from './components/FormularioCarga.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -41,7 +42,7 @@ function App() {
     cargarUsuarios();
   }, []);
 
-  // Crear nuevo elemento
+  // Crear elemento
   const crearElemento = async (nuevoElemento) => {
     const { error } = await supabase.from('elementos').insert([nuevoElemento]);
     if (error) {
@@ -99,55 +100,14 @@ function App() {
     }
   };
 
-  // Estilos responsivos
+  // Estilos
   const styles = `
-    .container {
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .header {
-      background: #b91c1c;
-      color: white;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 12px; }
-      .btn { padding: 16px; font-size: 17px; }
-      .input { font-size: 17px; }
-      h1, h2 { font-size: 1.4rem; }
-    }
+    .container { max-width: 100%; margin: 0 auto; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .btn { display: block; width: 100%; padding: 14px; margin: 10px 0; font-size: 16px; font-weight: bold; text-align: center; border: none; border-radius: 8px; cursor: pointer; }
+    .input { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .header { background: #b91c1c; color: white; padding: 16px; border-radius: 8px; margin-bottom: 24px; }
+    @media (max-width: 600px) { .container { padding: 12px; } .btn { padding: 16px; font-size: 17px; } .input { font-size: 17px; } }
   `;
 
   if (!user) {
@@ -157,15 +117,10 @@ function App() {
         <div className="container" style={{ textAlign: 'center', padding: '40px 20px' }}>
           <h1 style={{ color: '#b91c1c' }}>BomberoStock</h1>
           <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              handleLogin(e.target.legajo.value, e.target.password.value);
-            }}>
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(e.target.legajo.value, e.target.password.value); }}>
               <input name="legajo" placeholder="Legajo (3 dígitos)" required className="input" />
               <input name="password" type="password" placeholder="Contraseña" required className="input" />
-              <button type="submit" className="btn" style={{ backgroundColor: '#b91c1c', color: 'white' }}>
-                Ingresar
-              </button>
+              <button type="submit" className="btn" style={{ backgroundColor: '#b91c1c', color: 'white' }}>Ingresar</button>
             </form>
             <p style={{ fontSize: '14px', color: '#666', marginTop: '16px' }}>
               Pruebas: 001/bombero, 100/operador, 999/admin
@@ -186,14 +141,11 @@ function App() {
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
 
-        {/* Botón de escaneo */}
+        {/* Escanear QR */}
         <button
           onClick={() => {
             const code = prompt('Ingresa el código QR (ej: MAT-001)');
-            if (code) {
-              setSearchCode(code);
-              setTimeout(handleSearch, 100);
-            }
+            if (code) { setSearchCode(code); setTimeout(handleSearch, 100); }
           }}
           className="btn"
           style={{ backgroundColor: '#007bff', color: 'white' }}
@@ -217,8 +169,8 @@ function App() {
           </button>
         </div>
 
-        {/* ✅ CARGA DE ELEMENTOS (Operador y Admin) */}
-        {(user.role === 'operador' || user.role === 'admin') && !viendoUsuarios && !element && !mostrarFormulario && (
+        {/* Cargar elemento (Operador/Admin) */}
+        {(user.role === 'operador' || user.role === 'admin') && !viendoUsuarios && !element && (
           <div className="card">
             <h3>➕ Cargar nuevo elemento</h3>
             <button
@@ -231,283 +183,18 @@ function App() {
           </div>
         )}
 
-{/* ✅ FORMULARIO DE CARGA CON CAMPOS DINÁMICOS */}
-{mostrarFormulario && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    padding: '20px'
-  }}>
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      width: '100%',
-      maxWidth: '500px',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-    }}>
-      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-        <h2 style={{ margin: 0, color: '#333' }}>Cargar Nuevo Elemento</h2>
-      </div>
-
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
-
-        // ✅ Lógica de ubicación
-        let ubicacion_tipo = data.ubicacion_tipo || null;
-        let ubicacion_id = null;
-        let baulera_numero = null;
-        let deposito_nombre = null;
-
-        if (ubicacion_tipo === 'Móvil') {
-          ubicacion_id = data.ubicacion_id;
-          baulera_numero = data.baulera_numero;
-        } else if (ubicacion_tipo === 'Depósito') {
-          deposito_nombre = data.deposito_nombre;
-        }
-
-        // ✅ Crear elemento
-        crearElemento({
-          codigo_qr: data.codigo_qr.trim().toUpperCase(),
-          nombre: data.nombre.trim(),
-          tipo: data.tipo.trim(),
-          estado: data.estado,
-          en_servicio: data.en_servicio === 'on',
-          ubicacion_tipo,
-          ubicacion_id: ubicacion_id || null,
-          baulera_numero: baulera_numero || null,
-          deposito_nombre: deposito_nombre || null,
-          caracteristicas: data.caracteristicas || null,
-          ultima_inspeccion: new Date().toISOString().split('T')[0]
-        });
-
-        setMostrarFormulario(false);
-      }} style={{ padding: '20px' }}>
-
-        {/* Código QR */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Código QR *</label>
-          <input
-            name="codigo_qr"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
+        {/* Formulario de carga */}
+        {mostrarFormulario && (
+          <FormularioCarga
+            onClose={() => setMostrarFormulario(false)}
+            onCreate={(nuevo) => {
+              crearElemento(nuevo);
+              setMostrarFormulario(false);
             }}
           />
-        </div>
+        )}
 
-        {/* Nombre */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre *</label>
-          <input
-            name="nombre"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Tipo */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Tipo *</label>
-          <input
-            name="tipo"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Estado */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Estado</label>
-          <select
-            name="estado"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="Bueno">Bueno</option>
-            <option value="Regular">Regular</option>
-            <option value="Malo">Malo</option>
-          </select>
-        </div>
-
-        {/* ¿En servicio? */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>¿En servicio?</label>
-          <input
-            type="checkbox"
-            name="en_servicio"
-            style={{ marginRight: '8px', transform: 'scale(1.4)' }}
-          />
-          <span>Sí</span>
-        </div>
-
-        {/* Ubicación */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Ubicación</label>
-          <select
-            name="ubicacion_tipo"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="Móvil">Móvil</option>
-            <option value="Depósito">Depósito</option>
-          </select>
-        </div>
-
-        {/* Si es Móvil → Número de móvil y Baulera */}
-        {/*
-          Este bloque no se puede hacer con HTML puro en un form simple,
-          pero podemos simularlo con campos que solo se muestran si se selecciona "Móvil"
-          → Lo haremos con un estado, pero por ahora usamos un workaround visual
-        */}
-
-        {/* Número de móvil (solo si ubicación es Móvil) */}
-        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Número de móvil (si es Móvil)</label>
-          <input
-            name="ubicacion_id"
-            placeholder="Ej: 3"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Baulera (opcional) */}
-        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Baulera (opcional)</label>
-          <input
-            name="baulera_numero"
-            placeholder="Ej: 5"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Depósito (solo si ubicación es Depósito) */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre del depósito</label>
-          <select
-            name="deposito_nombre"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="Depósito 1">Depósito 1</option>
-            <option value="Depósito 2">Depósito 2</option>
-          </select>
-        </div>
-
-        {/* Características */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
-          <textarea
-            name="caracteristicas"
-            rows="3"
-            placeholder="Ej: 20 metros, caucho reforzado"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px',
-              resize: 'vertical'
-            }}
-          />
-        </div>
-
-        {/* Botones */}
-        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-          <button
-            type="submit"
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            Guardar Elemento
-          </button>
-          <button
-            type="button"
-            onClick={() => setMostrarFormulario(false)}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-        {/* ✅ GESTIÓN DE USUARIOS (solo Admin) */}
+        {/* Gestionar Usuarios (Admin) */}
         {user.role === 'admin' && (
           <div className="card">
             <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
@@ -524,58 +211,32 @@ function App() {
         {/* Panel: Gestionar Usuarios */}
         {viendoUsuarios && (
           <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '16px'
-            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
               <button
                 onClick={() => setViendoUsuarios(false)}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
+                style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 × Cerrar
               </button>
             </div>
-
             <button
               onClick={() => {
-                const legajo = prompt('Legajo (3 dígitos, ej: 001)');
-                if (!legajo || !/^\d{3}$/.test(legajo)) {
-                  alert('Legajo debe ser de 3 dígitos');
-                  return;
-                }
-                const nombre = prompt('Nombre');
-                if (!nombre) return;
-                const apellido = prompt('Apellido');
-                if (!apellido) return;
-                const password = prompt('Contraseña');
-                if (!password) return;
+                const legajo = prompt('Legajo (3 dígitos)');
+                if (!legajo || !/^\d{3}$/.test(legajo)) { alert('Legajo debe ser de 3 dígitos'); return; }
+                const nombre = prompt('Nombre'); if (!nombre) return;
+                const apellido = prompt('Apellido'); if (!apellido) return;
+                const password = prompt('Contraseña'); if (!password) return;
                 const rango = prompt('Rango (opcional)', '');
                 const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
                 const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
                 const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
                 const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
-
                 const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
-
                 const guardar = async () => {
                   const { error } = await supabase.from('usuarios').insert([nuevo]);
-                  if (error) {
-                    alert('Error: ' + error.message);
-                  } else {
-                    alert('✅ Usuario agregado');
-                    const { data } = await supabase.from('usuarios').select('*');
-                    setUsuarios(data);
-                  }
+                  if (error) { alert('Error: ' + error.message); } 
+                  else { alert('✅ Usuario agregado'); const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                 };
                 guardar();
               }}
@@ -584,58 +245,28 @@ function App() {
             >
               + Agregar Usuario
             </button>
-
-            <div style={{
-              maxHeight: '400px',
-              overflowY: 'auto',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              marginTop: '16px'
-            }}>
+            <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px', marginTop: '16px' }}>
               {usuarios.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
               ) : (
                 usuarios.map(u => (
-                  <div key={u.id} style={{
-                    padding: '14px',
-                    borderBottom: '1px solid #eee',
-                    backgroundColor: '#f9f9f9'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '8px'
-                    }}>
+                  <div key={u.id} style={{ padding: '14px', borderBottom: '1px solid #eee', backgroundColor: '#f9f9f9' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <strong>{u.nombre} {u.apellido} ({u.legajo})</strong>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                           onClick={() => {
-                            const nuevoRol = prompt('Nuevo rol: lectura, operador, admin', u.role);
+                            const nuevoRol = prompt('Nuevo rol', u.role);
                             if (['lectura', 'operador', 'admin'].includes(nuevoRol)) {
                               const editar = async () => {
-                                const { error } = await supabase
-                                  .from('usuarios')
-                                  .update({ role: nuevoRol })
-                                  .eq('id', u.id);
-                                if (error) {
-                                  alert('Error: ' + error.message);
-                                } else {
-                                  const { data } = await supabase.from('usuarios').select('*');
-                                  setUsuarios(data);
-                                }
+                                const { error } = await supabase.from('usuarios').update({ role: nuevoRol }).eq('id', u.id);
+                                if (error) { alert('Error: ' + error.message); } 
+                                else { const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                               };
                               editar();
                             }
                           }}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#ffc107',
-                            color: 'black',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
+                          style={{ padding: '6px 10px', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                         >
                           ✏️
                         </button>
@@ -643,28 +274,14 @@ function App() {
                           onClick={() => {
                             if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
                               const borrar = async () => {
-                                const { error } = await supabase
-                                  .from('usuarios')
-                                  .delete()
-                                  .eq('id', u.id);
-                                if (error) {
-                                  alert('Error: ' + error.message);
-                                } else {
-                                  const { data } = await supabase.from('usuarios').select('*');
-                                  setUsuarios(data);
-                                }
+                                const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+                                if (error) { alert('Error: ' + error.message); } 
+                                else { const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                               };
                               borrar();
                             }
                           }}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
+                          style={{ padding: '6px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                         >
                           🗑️
                         </button>
@@ -687,44 +304,17 @@ function App() {
           <div className="card">
             <button
               onClick={() => setElement(null)}
-              style={{
-                color: 'blue',
-                background: 'none',
-                border: 'none',
-                fontSize: '16px',
-                cursor: 'pointer',
-                marginBottom: '16px'
-              }}
+              style={{ color: 'blue', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer', marginBottom: '16px' }}
             >
               ← Volver
             </button>
-
             <h2>{element.nombre}</h2>
             {element.foto_url && (
-              <img
-                src={element.foto_url}
-                alt={element.nombre}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '200px',
-                  objectFit: 'contain',
-                  border: '1px solid #ddd',
-                  marginBottom: '16px'
-                }}
-              />
+              <img src={element.foto_url} alt={element.nombre} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', border: '1px solid #ddd', marginBottom: '16px' }} />
             )}
             <div style={{ lineHeight: '1.8' }}>
               <p><strong>Tipo:</strong> {element.tipo}</p>
-              <p>
-                <strong>Estado:</strong>{' '}
-                <span style={{
-                  color: element.estado === 'Bueno' ? 'green' :
-                         element.estado === 'Regular' ? 'orange' : 'red',
-                  fontWeight: 'bold'
-                }}>
-                  {element.estado}
-                </span>
-              </p>
+              <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
               <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
               <p><strong>Ubicación:</strong> 
                 {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id

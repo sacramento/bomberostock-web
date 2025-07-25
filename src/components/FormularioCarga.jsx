@@ -16,44 +16,34 @@ export default function FormularioCarga({ onClose, onCreate }) {
   });
 
   const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  setForm(prev => {
-    const nuevo = {
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
-    };
-    // 🔍 Estos logs te muestran qué está pasando
-    console.log('🔧 Campo modificado:', name, '=', value);
-    console.log('📋 Formulario actual:', nuevo);
-    return nuevo;
-  });
-};
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validación mínima
     if (!form.codigo_qr || !form.nombre || !form.tipo) {
       alert('Código, nombre y tipo son obligatorios');
       return;
     }
 
-    // Datos a guardar
-   const data = {
-  codigo_qr: form.codigo_qr.trim().toUpperCase(),
-  nombre: form.nombre.trim(),
-  tipo: form.tipo.trim(),
-  estado: form.estado,
-  en_servicio: form.en_servicio,
-  ubicacion_tipo: form.ubicacion_tipo || null,
-  ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
-  baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
-  deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
-  caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,  // ✅ Agregado
-  ultima_inspeccion: new Date().toISOString().split('T')[0]
-};
-
-console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
+    const data = {
+      codigo_qr: form.codigo_qr.trim().toUpperCase(),
+      nombre: form.nombre.trim(),
+      tipo: form.tipo.trim(),
+      estado: form.estado,
+      en_servicio: form.en_servicio,
+      ubicacion_tipo: form.ubicacion_tipo || null,
+      ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
+      baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
+      deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
+      caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,
+      ultima_inspeccion: new Date().toISOString().split('T')[0]
+    };
 
     onCreate(data);
   };
@@ -70,8 +60,7 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
       justifyContent: 'center',
       alignItems: 'center',
       zIndex: 9999,
-      padding: '20px',
-      boxSizing: 'border-box'
+      padding: '20px'
     }}>
       <div style={{
         backgroundColor: 'white',
@@ -135,7 +124,7 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
               value={form.tipo}
               onChange={handleChange}
               required
-              placeholder="Ej: Manga, Lanza, Cizalla"
+              placeholder="Ej: Manga, Lanza"
               style={{
                 width: '100%',
                 padding: '12px',
@@ -205,12 +194,13 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
           {form.ubicacion_tipo === 'Móvil' && (
             <>
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Número de móvil</label>
+                <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Número de móvil *</label>
                 <input
                   type="text"
                   name="ubicacion_id"
                   value={form.ubicacion_id}
                   onChange={handleChange}
+                  required
                   placeholder="Ej: 3"
                   style={{
                     width: '100%',
@@ -228,6 +218,7 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
                   name="baulera_numero"
                   value={form.baulera_numero}
                   onChange={handleChange}
+                  placeholder="Ej: 5"
                   style={{
                     width: '100%',
                     padding: '12px',
@@ -243,11 +234,12 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
           {/* Si es Depósito */}
           {form.ubicacion_tipo === 'Depósito' && (
             <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre del depósito</label>
+              <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre del depósito *</label>
               <select
                 name="deposito_nombre"
                 value={form.deposito_nombre}
                 onChange={handleChange}
+                required
                 style={{
                   width: '100%',
                   padding: '12px',
@@ -264,24 +256,24 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
           )}
 
           {/* Características */}
-<div style={{ marginBottom: '16px' }}>
-  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
-  <textarea
-    name="caracteristicas"
-    value={form.caracteristicas}
-    onChange={handleChange}
-    rows="3"
-    placeholder="Ej: 20 metros, caucho reforzado, conexión rápida"
-    style={{
-      width: '100%',
-      padding: '12px',
-      border: '1px solid #ccc',
-      borderRadius: '6px',
-      fontSize: '16px',
-      resize: 'vertical'
-    }}
-  />
-</div>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
+            <textarea
+              name="caracteristicas"
+              value={form.caracteristicas}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Ej: 20 metros, caucho reforzado"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px',
+                resize: 'vertical'
+              }}
+            />
+          </div>
 
           {/* Botones */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
@@ -295,8 +287,7 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
+                fontWeight: 'bold'
               }}
             >
               Guardar Elemento
@@ -312,8 +303,7 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
+                fontWeight: 'bold'
               }}
             >
               Cancelar
