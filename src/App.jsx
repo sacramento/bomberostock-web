@@ -192,45 +192,65 @@ function App() {
           <div className="card">
             <h3>➕ Cargar nuevo elemento</h3>
             <button
-              onClick={() => {
-                const codigo = prompt('Código QR');
-                if (!codigo) return;
-                const nombre = prompt('Nombre');
-                if (!nombre) return;
-                const tipo = prompt('Tipo');
-                const estado = prompt('Estado', 'Bueno');
-                const enServicioInput = prompt('¿En servicio? (sí/no)', 'sí');
-                const enServicio = enServicioInput?.toLowerCase().trim() === 'sí';
+  onClick={() => {
+    // 1. Datos básicos
+    const codigo = prompt('Código QR (ej: MAT-001)');
+    if (!codigo) return;
+    const nombre = prompt('Nombre del elemento');
+    if (!nombre) return;
+    const tipo = prompt('Tipo (ej: Manga, Lanza)') || null;
 
-                const ubicacionTipo = prompt('Ubicación (Móvil o Depósito)', '').trim();
-                let ubicacionId = '';
-                let bauleraNumero = '';
-                let depositoNombre = '';
+    // 2. Estado
+    const estado = prompt('Estado: Bueno, Regular, Malo', 'Bueno') || 'Bueno';
 
-                if (ubicacionTipo.toLowerCase() === 'móvil') {
-                  ubicacionId = prompt('Número de móvil', '');
-                  bauleraNumero = prompt('Baulera', '');
-                } else if (ubicacionTipo.toLowerCase() === 'depósito') {
-                  depositoNombre = prompt('Nombre del depósito', '');
-                }
+    // 3. ¿En servicio?
+    const enServicioInput = prompt('¿En servicio? (sí/no)', 'sí');
+    const enServicio = enServicioInput === null 
+      ? true 
+      : enServicioInput.toLowerCase().trim() === 'sí';
 
-                crearElemento({
-                  codigo_qr: codigo.trim().toUpperCase(),
-                  nombre,
-                  tipo,
-                  estado,
-                  en_servicio: enServicio,
-                  ubicacion_tipo: ubicacionTipo || null,
-                  ubicacion_id: ubicacionId || null,
-                  baulera_numero: bauleraNumero || null,
-                  deposito_nombre: depositoNombre || null
-                });
-              }}
-              className="btn"
-              style={{ backgroundColor: '#28a745', color: 'white' }}
-            >
-              + Cargar elemento
-            </button>
+    // 4. Ubicación: Móvil o Depósito
+    const ubicacionTipo = prompt('Ubicación: escribe "Móvil" o "Depósito"', '').trim();
+
+    let ubicacionId = null;
+    let bauleraNumero = null;
+    let depositoNombre = null;
+
+    // 5. Si es Móvil
+    if (ubicacionTipo && ubicacionTipo.toLowerCase() === 'móvil') {
+      ubicacionId = prompt('Número de móvil (ej: 3)', '') || null;
+      bauleraNumero = prompt('Número de baulera (opcional)', '') || null;
+    }
+
+    // 6. Si es Depósito
+    else if (ubicacionTipo && ubicacionTipo.toLowerCase() === 'depósito') {
+      const depositoInput = prompt('¿Depósito 1 o Depósito 2?', '1');
+      depositoNombre = depositoInput === '2' ? 'Depósito 2' : 'Depósito 1';
+    }
+
+    // 7. Fecha de última inspección (automática)
+    const ultimaInspeccion = new Date().toISOString().split('T')[0];
+
+    // 8. Guardar
+    crearElemento({
+      codigo_qr: codigo.trim().toUpperCase(),
+      nombre,
+      tipo,
+      estado,
+      en_servicio: enServicio,
+      ultima_inspeccion: ultimaInspeccion,
+      ubicacion_tipo: ubicacionTipo || null,
+      ubicacion_id: ubicacionId,
+      baulera_numero: bauleraNumero,
+      deposito_nombre: depositoNombre
+      // vencimiento, proxima_inspeccion, foto_url → REMOVIDOS
+    });
+  }}
+  className="btn"
+  style={{ backgroundColor: '#28a745', color: 'white' }}
+>
+  + Cargar elemento
+</button>
           </div>
         )}
 
