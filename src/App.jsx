@@ -1,18 +1,20 @@
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
+import FormularioCarga from './components/FormularioCarga.jsx'; // ✅ Importamos el formulario
 
 function App() {
   const [user, setUser] = useState(null);
   const [searchCode, setSearchCode] = useState('');
   const [element, setElement] = useState(null);
   const [elementos, setElementos] = useState({});
+  const [mostrarFormulario, setMostrarFormulario] = useState(false); // ✅ Estado para mostrar el formulario
 
-  // Cargar elementos
+  // Cargar elementos desde Supabase
   useEffect(() => {
     const cargarElementos = async () => {
       const { data, error } = await supabase.from('elementos').select('*');
       if (error) {
-        console.error('Error:', error);
+        console.error('Error al cargar:', error);
         alert('Error: ' + error.message);
       } else {
         const map = {};
@@ -25,12 +27,15 @@ function App() {
     cargarElementos();
   }, []);
 
-  const crearElemento = async (nuevo) => {
-    const { error } = await supabase.from('elementos').insert([nuevo]);
+  // Crear nuevo elemento
+  const crearElemento = async (nuevoElemento) => {
+    const { error } = await supabase.from('elementos').insert([nuevoElemento]);
     if (error) {
-      alert('Error: ' + error.message);
+      console.error('Error al crear:', error);
+      alert('❌ Error: ' + error.message);
     } else {
-      alert('✅ Creado');
+      alert('✅ Elemento creado con éxito');
+      // Recargar lista
       const { data } = await supabase.from('elementos').select('*');
       const map = {};
       data.forEach(el => {
@@ -40,10 +45,15 @@ function App() {
     }
   };
 
+  // Actualizar elemento
   const actualizarElemento = async (codigo, cambios) => {
-    const { error } = await supabase.from('elementos').update(cambios).eq('codigo_qr', codigo);
+    const { error } = await supabase
+      .from('elementos')
+      .update(cambios)
+      .eq('codigo_qr', codigo);
     if (error) {
-      alert('Error: ' + error.message);
+      console.error('Error al actualizar:', error);
+      alert('❌ Error: ' + error.message);
     } else {
       alert('✅ Actualizado');
       const { data } = await supabase.from('elementos').select('*');
@@ -55,21 +65,31 @@ function App() {
     }
   };
 
+  // Login
   const handleLogin = (legajo, password) => {
-    if (legajo === '001' && password === 'bombero') setUser({ legajo, role: 'lectura' });
-    else if (legajo === '100' && password === 'operador') setUser({ legajo, role: 'operador' });
-    else if (legajo === '999' && password === 'admin') setUser({ legajo, role: 'admin' });
-    else alert('Incorrecto');
+    if (legajo === '001' && password === 'bombero') {
+      setUser({ legajo, role: 'lectura' });
+    } else if (legajo === '100' && password === 'operador') {
+      setUser({ legajo, role: 'operador' });
+    } else if (legajo === '999' && password === 'admin') {
+      setUser({ legajo, role: 'admin' });
+    } else {
+      alert('Legajo o contraseña incorrecta');
+    }
   };
 
+  // Búsqueda
   const handleSearch = () => {
     const code = searchCode.trim().toUpperCase();
     const found = elementos[code];
-    if (found) setElement(found);
-    else alert('No encontrado');
+    if (found) {
+      setElement(found);
+    } else {
+      alert('Elemento no encontrado');
+    }
   };
 
-  // Estilos responsivos inyectados
+  // Estilos responsivos
   const styles = `
     .container {
       max-width: 100%;
@@ -159,7 +179,7 @@ function App() {
         {/* Botón de escaneo */}
         <button
           onClick={() => {
-            const code = prompt('Código QR (ej: MAT-001)');
+            const code = prompt('Ingresa el código QR (ej: MAT-001)');
             if (code) {
               setSearchCode(code);
               setTimeout(handleSearch, 100);
@@ -187,75 +207,34 @@ function App() {
           </button>
         </div>
 
-        {/* Cargar elemento */}
-        {!element && (user.role === 'operador' || user.role === 'admin') && (
+        {/* ✅ BOTÓN DE CARGA CON FORMULARIO */}
+        {(user.role === 'operador' || user.role === 'admin') && (
           <div className="card">
             <h3>➕ Cargar nuevo elemento</h3>
+            {/* Botón que abre el formulario */}
             <button
-  onClick={() => {
-    // 1. Datos básicos
-    const codigo = prompt('Código QR (ej: MAT-001)');
-    if (!codigo) return;
-    const nombre = prompt('Nombre del elemento');
-    if (!nombre) return;
-    const tipo = prompt('Tipo (ej: Manga, Lanza)') || null;
-
-    // 2. Estado
-    const estado = prompt('Estado: Bueno, Regular, Malo', 'Bueno') || 'Bueno';
-
-    // 3. ¿En servicio?
-    const enServicioInput = prompt('¿En servicio? (sí/no)', 'sí');
-    const enServicio = enServicioInput === null 
-      ? true 
-      : enServicioInput.toLowerCase().trim() === 'sí';
-
-    // 4. Ubicación: Móvil o Depósito
-    const ubicacionTipo = prompt('Ubicación: escribe "Móvil" o "Depósito"', '').trim();
-
-    let ubicacionId = null;
-    let bauleraNumero = null;
-    let depositoNombre = null;
-
-    // 5. Si es Móvil
-    if (ubicacionTipo && ubicacionTipo.toLowerCase() === 'móvil') {
-      ubicacionId = prompt('Número de móvil (ej: 3)', '') || null;
-      bauleraNumero = prompt('Número de baulera (opcional)', '') || null;
-    }
-
-    // 6. Si es Depósito
-    else if (ubicacionTipo && ubicacionTipo.toLowerCase() === 'depósito') {
-      const depositoInput = prompt('¿Depósito 1 o Depósito 2?', '1');
-      depositoNombre = depositoInput === '2' ? 'Depósito 2' : 'Depósito 1';
-    }
-
-    // 7. Fecha de última inspección (automática)
-    const ultimaInspeccion = new Date().toISOString().split('T')[0];
-
-    // 8. Guardar
-    crearElemento({
-      codigo_qr: codigo.trim().toUpperCase(),
-      nombre,
-      tipo,
-      estado,
-      en_servicio: enServicio,
-      ultima_inspeccion: ultimaInspeccion,
-      ubicacion_tipo: ubicacionTipo || null,
-      ubicacion_id: ubicacionId,
-      baulera_numero: bauleraNumero,
-      deposito_nombre: depositoNombre
-      // vencimiento, proxima_inspeccion, foto_url → REMOVIDOS
-    });
-  }}
-  className="btn"
-  style={{ backgroundColor: '#28a745', color: 'white' }}
->
-  + Cargar elemento
-</button>
+              onClick={() => setMostrarFormulario(true)}
+              className="btn"
+              style={{ backgroundColor: '#28a745', color: 'white' }}
+            >
+              + Cargar elemento nuevo
+            </button>
           </div>
         )}
 
+        {/* ✅ FORMULARIO MODAL */}
+        {mostrarFormulario && (
+          <FormularioCarga
+            onClose={() => setMostrarFormulario(false)}
+            onCreate={(nuevo) => {
+              crearElemento(nuevo);
+              setMostrarFormulario(false);
+            }}
+          />
+        )}
+
         {/* Ficha del elemento */}
-        {element && (
+        {element && !mostrarFormulario && (
           <div className="card">
             <button
               onClick={() => setElement(null)}
@@ -307,6 +286,7 @@ function App() {
               <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
             </div>
 
+            {/* Botón de edición */}
             {user.role !== 'lectura' && (
               <button
                 onClick={() => {
@@ -321,10 +301,10 @@ function App() {
                   let bauleraNumero = '';
                   let depositoNombre = '';
 
-                  if (ubicacionTipo.toLowerCase() === 'móvil') {
+                  if (ubicacionTipo.toLowerCase().includes('móvil')) {
                     ubicacionId = prompt('Número de móvil', element.ubicacion_id || '') || '';
                     bauleraNumero = prompt('Baulera', element.baulera_numero || '') || '';
-                  } else if (ubicacionTipo.toLowerCase() === 'depósito') {
+                  } else if (ubicacionTipo.toLowerCase().includes('depósito')) {
                     depositoNombre = prompt('Depósito', element.deposito_nombre || '') || '';
                   }
 
