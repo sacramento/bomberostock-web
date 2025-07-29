@@ -15,39 +15,35 @@ export default function FormularioCarga({ onClose, onCreate }) {
     caracteristicas: ''
   });
 
-const handleChange = (e) => {
-  const { name, value, type, checked } = e.target;
-  setForm(prev => ({
-    ...prev,
-    [name]: type === 'checkbox' ? checked : value
-  }));
-};
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validación mínima
     if (!form.codigo_qr || !form.nombre || !form.tipo) {
       alert('Código, nombre y tipo son obligatorios');
       return;
     }
 
-    // Datos a guardar
-   const data = {
-  codigo_qr: form.codigo_qr.trim().toUpperCase(),
-  nombre: form.nombre.trim(),
-  tipo: form.tipo.trim(),
-  estado: form.estado,
-  en_servicio: form.en_servicio,
-  ubicacion_tipo: form.ubicacion_tipo || null,
-  ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
-  baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
-  deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
-  caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,  // ✅ Agregado
-  ultima_inspeccion: new Date().toISOString().split('T')[0]
-};
-
-console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
+    const data = {
+      codigo_qr: form.codigo_qr.trim().toUpperCase(),
+      nombre: form.nombre.trim(),
+      tipo: form.tipo.trim(),
+      estado: form.estado,
+      en_servicio: form.en_servicio,
+      ubicacion_tipo: form.ubicacion_tipo || null,
+      ubicacion_id: form.ubicacion_tipo === 'Móvil' ? form.ubicacion_id || null : null,
+      baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
+      deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
+      caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,
+      ultima_inspeccion: new Date().toISOString().split('T')[0]
+    };
 
     onCreate(data);
   };
@@ -258,24 +254,24 @@ console.log('📤 Enviando a Supabase:', data);  // 🔥 Clave: ver si aparece
           )}
 
           {/* Características */}
-<div style={{ marginBottom: '16px' }}>
-  <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
-  <textarea
-    name="caracteristicas"
-    value={form.caracteristicas}
-    onChange={handleChange}
-    rows="3"
-    placeholder="Ej: 20 metros, caucho reforzado, conexión rápida"
-    style={{
-      width: '100%',
-      padding: '12px',
-      border: '1px solid #ccc',
-      borderRadius: '6px',
-      fontSize: '16px',
-      resize: 'vertical'
-    }}
-  />
-</div>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
+            <textarea
+              name="caracteristicas"
+              value={form.caracteristicas}
+              onChange={handleChange}
+              rows="3"
+              placeholder="Ej: 20 metros, caucho reforzado, conexión rápida"
+              style={{
+                width: '100%',
+                padding: '12px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px',
+                resize: 'vertical'
+              }}
+            />
+          </div>
 
           {/* Botones */}
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
