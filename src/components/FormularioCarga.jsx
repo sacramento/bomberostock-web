@@ -15,18 +15,12 @@ export default function FormularioCarga({ onClose, onCreate }) {
     caracteristicas: ''
   });
 
-  const handleChange = (e) => {
+ const handleChange = (e) => {
   const { name, value, type, checked } = e.target;
-  setForm(prev => {
-    const nuevo = {
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    };
-    // 🔍 Estos logs te muestran qué está pasando
-    console.log('🔧 Campo modificado:', name, '=', value);
-    console.log('📋 Formulario actual:', nuevo);
-    return nuevo;
-  });
+  setForm(prev => ({
+    ...prev,
+    [name]: type === 'checkbox' ? checked : value
+  }));
 };
 
   const handleSubmit = (e) => {
