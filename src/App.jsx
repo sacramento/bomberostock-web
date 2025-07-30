@@ -16,7 +16,190 @@ function App() {
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
 
 
-  
+   // Función para abrir el reporte en nueva pestaña
+const abrirReporteEnPestaña = () => {
+  const elementosArray = Object.values(elementos);
+
+  // Filtrar según estado actual
+  let elementosFiltrados = elementosArray;
+
+  if (filtroUbicacion === 'movil' && movilSeleccionado) {
+    elementosFiltrados = elementosArray.filter(
+      el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+    );
+  } else if (filtroUbicacion === 'movil') {
+    elementosFiltrados = elementosArray.filter(el => el.ubicacion_tipo === 'Móvil');
+  }
+
+  if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+    elementosFiltrados = elementosArray.filter(
+      el => el.deposito_nombre === depositoSeleccionado
+    );
+  } else if (filtroUbicacion === 'deposito') {
+    elementosFiltrados = elementosArray.filter(el => el.deposito_nombre);
+  }
+
+  // Usamos 'let' para poder modificar 'contenido'
+  let contenido = `
+    <html>
+    <head>
+      <title>Reporte de Materiales</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 30px; }
+        h1 { color: #b91c1c; text-align: center; }
+        h3 { background: #b91c1c; color: white; padding: 12px; border-radius: 6px; text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th { background: #333; color: white; padding: 10px; text-align: left; }
+        td { padding: 8px; border: 1px solid #ccc; }
+        .footer { text-align: center; margin-top: 40px; color: #666; font-size: 12px; }
+        @media print {
+          @page { margin: 1cm; }
+          .no-print { display: none !important; }
+        }
+      </style>
+    </head>
+    <body>
+      <button class="no-print" onclick="window.print()" style="padding:10px; background:#007bff; color:white; border:none; border-radius:4px; cursor:pointer; margin-bottom:20px;">
+        🖨️ Imprimir Reporte
+      </button>
+      <button class="no-print" onclick="window.close()" style="padding:10px; background:#dc3545; color:white; border:none; border-radius:4px; cursor:pointer; margin-bottom:20px; margin-left:10px;">
+        × Cerrar
+      </button>
+
+      <h1>📋 Reporte de Materiales</h1>
+      <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+  `;
+
+  // Agrupar por móvil
+  if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+    const moviles = {};
+    elementosFiltrados.forEach(el => {
+      if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
+      moviles[el.ubicacion_id].push(el);
+    });
+
+    Object.keys(moviles).sort().forEach(movil => {
+      contenido += `<h3>Móvil ${movil}</h3>`;
+      contenido += `
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Baulera</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      moviles[movil].forEach(el => {
+        contenido += `
+          <tr>
+            <td>${el.nombre}</td>
+            <td>${el.tipo}</td>
+            <td style="color: ${
+              el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+            }; font-weight:bold;">
+              ${el.estado}
+            </td>
+            <td>${el.baulera_numero || '–'}</td>
+          </tr>
+        `;
+      });
+      contenido += `</tbody></table>`;
+    });
+  }
+
+  // Agrupar por depósito
+  else if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
+    const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
+    elementosFiltrados.forEach(el => {
+      if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
+    });
+
+    Object.keys(depositos).forEach(dep => {
+      contenido += `<h3>${dep}</h3>`;
+      contenido += `
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      depositos[dep].forEach(el => {
+        contenido += `
+          <tr>
+            <td>${el.nombre}</td>
+            <td>${el.tipo}</td>
+            <td style="color: ${
+              el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+            }; font-weight:bold;">
+              ${el.estado}
+            </td>
+          </tr>
+        `;
+      });
+      contenido += `</tbody></table>`;
+    });
+  }
+
+  // Vista plana
+  else {
+    const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                   filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                   'Todos los elementos';
+
+    contenido += `<h3>${titulo}</h3>`;
+    contenido += `
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Ubicación</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    elementosFiltrados.forEach(el => {
+      const ubicacion = el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
+        ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? ', Baulera ' + el.baulera_numero : ''}`
+        : el.deposito_nombre || '–';
+
+      contenido += `
+        <tr>
+          <td>${el.nombre}</td>
+          <td>${el.tipo}</td>
+          <td style="color: ${
+            el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+          }; font-weight:bold;">
+            ${el.estado}
+          </td>
+          <td>${ubicacion}</td>
+        </tr>
+      `;
+    });
+    contenido += `</tbody></table>`;
+  }
+
+  // Cierre del HTML
+  contenido += `
+      <div class="footer">
+        Reporte generado desde BomberoStock
+      </div>
+    </body>
+    </html>
+  `;
+
+  const ventana = window.open('', '_blank');
+  ventana.document.write(contenido);
+  ventana.document.close();
+};
 
   // Cargar elementos
   useEffect(() => {
