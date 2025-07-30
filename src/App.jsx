@@ -329,18 +329,36 @@ function App() {
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
 
-{/* Botón: Escanear QR con cámara (versión full screen, sin permisos extra) */}
+{/* Botón: Escanear QR con cámara trasera (sin selector) */}
 <button
   onClick={async () => {
+    // Cargar Html5Qrcode (versión sin UI)
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
     
-    script.onload = () => {
-      // Overlay full screen
+    script.onload = async () => {
+      // Pedir permiso de cámara directamente para trasera
+      let stream;
+      try {
+        // Forzar cámara trasera
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: 'environment' }
+        });
+      } catch (err) {
+        try {
+          // Fallback: cualquier cámara
+          stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (err) {
+          alert('No se pudo acceder a la cámara. Otorgá permisos.');
+          return;
+        }
+      }
+
+      // Crear overlay fullscreen
       const overlay = document.createElement('div');
       overlay.style.position = 'fixed';
-      overlay.style.top = '0';
-      overlay.style.left = '0';
+      overlay.style.top = 0;
+      overlay.style.left = 0;
       overlay.style.width = '100vw';
       overlay.style.height = '100vh';
       overlay.style.backgroundColor = '#000';
@@ -352,18 +370,19 @@ function App() {
       overlay.style.padding = 'env(safe-area-inset)';
       overlay.style.boxSizing = 'border-box';
 
-      // Contenedor del escáner (ocupa casi toda la pantalla)
-      const container = document.createElement('div');
-      container.id = 'qr-reader';
-      container.style.width = '90vw';
-      container.style.height = '70vh';
-      container.style.maxWidth = '600px';
-      container.style.maxHeight = '500px';
-      container.style.borderRadius = '12px';
-      container.style.overflow = 'hidden';
-      container.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+      // Video (sin autoplay, pero con stream)
+      const video = document.createElement('video');
+      video.style.width = '90vw';
+      video.style.height = '70vh';
+      video.style.maxWidth = '600px';
+      video.style.maxHeight = '500px';
+      video.style.borderRadius = '12px';
+      video.style.objectFit = 'cover';
+      video.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+      video.srcObject = stream;
+      video.play();
 
-      // Botón grande para cancelar
+      // Botón de cancelar
       const cancelBtn = document.createElement('button');
       cancelBtn.textContent = '❌ Cerrar';
       cancelBtn.style.marginTop = '16px';
@@ -377,51 +396,56 @@ function App() {
       cancelBtn.style.width = '80%';
       cancelBtn.style.maxWidth = '300px';
 
-      // Añadir elementos al overlay
-      overlay.appendChild(container);
+      // Añadir al overlay
+      overlay.appendChild(video);
       overlay.appendChild(cancelBtn);
       document.body.appendChild(overlay);
 
-      // Función para cerrar
-      const closeScanner = () => {
-        try {
-          window.html5QrcodeScanner.clear();
-        } catch (e) {}
+      // Cerrar limpio
+      const close = () => {
+        if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+        }
         if (document.body.contains(overlay)) {
           document.body.removeChild(overlay);
         }
       };
 
-      cancelBtn.onclick = closeScanner;
+      cancelBtn.onclick = close;
 
-      // Iniciar escáner con configuración FULL SCREEN y cámara trasera
-      try {
-        window.html5QrcodeScanner = new Html5QrcodeScanner(
-          'qr-reader',
-          {
-            fps: 10,
-            qrbox: 300, // Cuadro grande para escanear fácil
-            facingMode: 'environment', // 🔥 Fuerza cámara trasera
-            disableFlip: true, // ❌ No permite cambiar a frontal
-          },
-          false // No muestra el selector de cámara
-        );
+      // Iniciar escáner solo con el video existente
+      const html5QrCode = new Html5Qrcode("qr-reader");
+      
+      // Creamos un contenedor oculto para que funcione el escáner
+      const hiddenDiv = document.createElement('div');
+      hiddenDiv.id = 'qr-reader';
+      hiddenDiv.style.position = 'absolute';
+      hiddenDiv.style.top = '-9999px';
+      document.body.appendChild(hiddenDiv);
 
-        window.html5QrcodeScanner.render(
-          (decodedText) => {
-            closeScanner();
-            setSearchCode(decodedText);
-            handleSearch();
-          },
-          (errorMessage) => {
-            // Puedes ignorar errores menores
-          }
-        );
-      } catch (err) {
-        console.error("Error al iniciar escáner:", err);
-        alert("No se pudo acceder a la cámara. Intenta nuevamente.");
-        closeScanner();
-      }
+      // Iniciar escaneo desde el video
+      html5QrCode.start(
+        { facingMode: "environment" }, // sigue intentando usar trasera
+        {
+          fps: 10,
+          qrbox: 300
+        },
+        (decodedText) => {
+          close();
+          html5QrCode.stop().catch(e => {});
+          document.body.removeChild(hiddenDiv);
+          setSearchCode(decodedText);
+          handleSearch();
+        },
+        (err) => {
+          // console.log("Error escaneando:", err);
+        }
+      ).catch(err => {
+        console.error("No se pudo iniciar el escáner:", err);
+        close();
+        document.body.removeChild(hiddenDiv);
+        alert("Error al iniciar la cámara.");
+      });
     };
 
     script.onerror = () => {
@@ -433,7 +457,7 @@ function App() {
   className="btn"
   style={{ backgroundColor: '#007bff', color: 'white' }}
 >
-  📷 Escanear QR (Cámara Completa)
+  📷 Escanear QR (Cámara Trasera Directa)
 </button>
 
         {/* Búsqueda */}
