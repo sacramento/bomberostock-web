@@ -329,80 +329,119 @@ function App() {
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
 
-        {/* Botón: Escanear QR con cámara */}
+{/* Botón: Escanear QR con cámara (versión mejorada) */}
 <button
   onClick={async () => {
-    // Cargar Html5Qrcode dinámicamente solo cuando se necesita
     const script = document.createElement('script');
     script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+    
     script.onload = () => {
-      const modal = document.createElement('div');
-      modal.style.position = 'fixed';
-      modal.style.top = '0';
-      modal.style.left = '0';
-      modal.style.width = '100%';
-      modal.style.height = '100%';
-      modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
-      modal.style.display = 'flex';
-      modal.style.flexDirection = 'column';
-      modal.style.zIndex = '9999';
-      modal.style.justifyContent = 'space-between';
+      // Crear overlay completo de pantalla
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.top = '0';
+      overlay.style.left = '0';
+      overlay.style.width = '100vw';
+      overlay.style.height = '100vh';
+      overlay.style.backgroundColor = 'rgba(0,0,0,0.95)';
+      overlay.style.zIndex = '9999';
+      overlay.style.display = 'flex';
+      overlay.style.flexDirection = 'column';
+      overlay.style.alignItems = 'center';
+      overlay.style.justifyContent = 'space-between';
+      overlay.style.padding = 'env(safe-area-inset)';
+      overlay.style.boxSizing = 'border-box';
 
+      // Contenedor del escáner
       const container = document.createElement('div');
       container.id = 'qr-reader';
-      container.style.padding = '20px';
+      container.style.width = '100%';
       container.style.flex = '1';
       container.style.display = 'flex';
       container.style.justifyContent = 'center';
       container.style.alignItems = 'center';
+      container.style.padding = '20px';
 
-      const controls = document.createElement('div');
-      controls.style.padding = '16px';
-      controls.style.display = 'flex';
-      controls.style.gap = '12px';
-      controls.style.justifyContent = 'center';
+      // Botones: Cancelar y Ayuda
+      const footer = document.createElement('div');
+      footer.style.padding = '16px';
+      footer.style.width = '100%';
+      footer.style.display = 'flex';
+      footer.style.flexDirection = 'column';
+      footer.style.gap = '12px';
+      footer.style.textAlign = 'center';
 
-      const closeBtn = document.createElement('button');
-      closeBtn.textContent = 'Cancelar';
-      closeBtn.style.padding = '12px 24px';
-      closeBtn.style.backgroundColor = '#dc3545';
-      closeBtn.style.color = 'white';
-      closeBtn.style.border = 'none';
-      closeBtn.style.borderRadius = '6px';
-      closeBtn.style.cursor = 'pointer';
-      closeBtn.onclick = () => {
+      const cancelBtn = document.createElement('button');
+      cancelBtn.textContent = '❌ Cancelar';
+      cancelBtn.style.padding = '14px';
+      cancelBtn.style.backgroundColor = '#dc3545';
+      cancelBtn.style.color = 'white';
+      cancelBtn.style.border = 'none';
+      cancelBtn.style.borderRadius = '8px';
+      cancelBtn.style.width = '100%';
+      cancelBtn.style.fontSize = '16px';
+      cancelBtn.style.cursor = 'pointer';
+
+      const helpText = document.createElement('p');
+      helpText.textContent = 'Apunta al código QR';
+      helpText.style.color = 'white';
+      helpText.style.fontSize = '14px';
+      helpText.style.margin = '0';
+
+      footer.appendChild(helpText);
+      footer.appendChild(cancelBtn);
+
+      overlay.appendChild(container);
+      overlay.appendChild(footer);
+      document.body.appendChild(overlay);
+
+      // Función para cerrar el escáner
+      const closeScanner = () => {
         try {
           window.html5QrcodeScanner.clear();
         } catch (e) {}
-        document.body.removeChild(modal);
+        if (document.body.contains(overlay)) {
+          document.body.removeChild(overlay);
+        }
       };
 
-      controls.appendChild(closeBtn);
-      modal.appendChild(container);
-      modal.appendChild(controls);
-      document.body.appendChild(modal);
+      cancelBtn.onclick = closeScanner;
 
-      // Iniciar escáner
-      function onScanSuccess(decodedText) {
-        document.body.removeChild(modal);
-        setSearchCode(decodedText);
-        handleSearch();
+      // Iniciar escáner con configuración optimizada
+      try {
+        window.html5QrcodeScanner = new Html5QrcodeScanner(
+          'qr-reader',
+          {
+            fps: 10,
+            qrbox: Math.min(window.innerWidth, 300), // Cuadro grande pero centrado
+            facingMode: 'environment', // Fuerza cámara trasera
+            disableFlip: false,
+          },
+          /* verbose */ false
+        );
+
+        window.html5QrcodeScanner.render(
+          (decodedText) => {
+            closeScanner();
+            setSearchCode(decodedText);
+            handleSearch();
+          },
+          (errorMessage) => {
+            // Opcional: mostrar errores en consola
+            // console.warn("QR error:", errorMessage);
+          }
+        );
+      } catch (err) {
+        console.error("Error al iniciar escáner:", err);
+        alert("Error al iniciar la cámara. Intenta nuevamente.");
+        closeScanner();
       }
-
-      function onScanFailure(error) {
-        console.warn('Error al escanear:', error);
-      }
-
-      window.html5QrcodeScanner = new Html5QrcodeScanner(
-        'qr-reader',
-        { fps: 10, qrbox: 250, facingMode: 'environment' },
-        false
-      );
-      window.html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     };
+
     script.onerror = () => {
-      alert('Error al cargar el escáner. Reintenta.');
+      alert('Error al cargar el escáner. Revisa tu conexión.');
     };
+
     document.head.appendChild(script);
   }}
   className="btn"
