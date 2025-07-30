@@ -1,7 +1,6 @@
-
-
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
+import FormularioCarga from './components/FormularioCarga.jsx';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -11,13 +10,10 @@ function App() {
   const [usuarios, setUsuarios] = useState([]);
   const [viendoUsuarios, setViendoUsuarios] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
-
-
-const [mostrarReporte, setMostrarReporte] = useState(false);
-const [filtroUbicacion, setFiltroUbicacion] = useState(''); // 'todos', 'movil', 'deposito'
-const [movilSeleccionado, setMovilSeleccionado] = useState('');
-const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
-
+  const [mostrarReporte, setMostrarReporte] = useState(false);
+  const [filtroUbicacion, setFiltroUbicacion] = useState(''); // 'todos', 'movil', 'deposito'
+  const [movilSeleccionado, setMovilSeleccionado] = useState('');
+  const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
 
   // Cargar elementos
   useEffect(() => {
@@ -50,7 +46,7 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
     cargarUsuarios();
   }, []);
 
-  // Crear nuevo elemento
+  // Crear elemento
   const crearElemento = async (nuevoElemento) => {
     const { error } = await supabase.from('elementos').insert([nuevoElemento]);
     if (error) {
@@ -108,55 +104,14 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
     }
   };
 
-  // Estilos responsivos
+  // Estilos
   const styles = `
-    .container {
-      max-width: 100%;
-      margin: 0 auto;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      margin: 10px 0;
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .input {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0;
-      font-size: 16px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      box-sizing: border-box;
-    }
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-      margin-bottom: 20px;
-    }
-    .header {
-      background: #b91c1c;
-      color: white;
-      padding: 16px;
-      border-radius: 8px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 600px) {
-      .container { padding: 12px; }
-      .btn { padding: 16px; font-size: 17px; }
-      .input { font-size: 17px; }
-      h1, h2 { font-size: 1.4rem; }
-    }
+    .container { max-width: 100%; margin: 0 auto; padding: 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    .btn { display: block; width: 100%; padding: 14px; margin: 10px 0; font-size: 16px; font-weight: bold; text-align: center; border: none; border-radius: 8px; cursor: pointer; }
+    .input { width: 100%; padding: 12px; margin: 8px 0; font-size: 16px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+    .header { background: #b91c1c; color: white; padding: 16px; border-radius: 8px; margin-bottom: 24px; }
+    @media (max-width: 600px) { .container { padding: 12px; } .btn { padding: 16px; font-size: 17px; } .input { font-size: 17px; } }
   `;
 
   if (!user) {
@@ -166,15 +121,10 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
         <div className="container" style={{ textAlign: 'center', padding: '40px 20px' }}>
           <h1 style={{ color: '#b91c1c' }}>BomberoStock</h1>
           <div className="card" style={{ maxWidth: '400px', margin: '0 auto' }}>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              handleLogin(e.target.legajo.value, e.target.password.value);
-            }}>
+            <form onSubmit={(e) => { e.preventDefault(); handleLogin(e.target.legajo.value, e.target.password.value); }}>
               <input name="legajo" placeholder="Legajo (3 dígitos)" required className="input" />
               <input name="password" type="password" placeholder="Contraseña" required className="input" />
-              <button type="submit" className="btn" style={{ backgroundColor: '#b91c1c', color: 'white' }}>
-                Ingresar
-              </button>
+              <button type="submit" className="btn" style={{ backgroundColor: '#b91c1c', color: 'white' }}>Ingresar</button>
             </form>
             <p style={{ fontSize: '14px', color: '#666', marginTop: '16px' }}>
               Pruebas: 001/bombero, 100/operador, 999/admin
@@ -199,10 +149,7 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
         <button
           onClick={() => {
             const code = prompt('Ingresa el código QR (ej: MAT-001)');
-            if (code) {
-              setSearchCode(code);
-              setTimeout(handleSearch, 100);
-            }
+            if (code) { setSearchCode(code); setTimeout(handleSearch, 100); }
           }}
           className="btn"
           style={{ backgroundColor: '#007bff', color: 'white' }}
@@ -226,8 +173,8 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </button>
         </div>
 
-        {/* ✅ CARGA DE ELEMENTOS (Operador y Admin) */}
-        {(user.role === 'operador' || user.role === 'admin') && !viendoUsuarios && !element && !mostrarFormulario && (
+        {/* Cargar elemento (Operador/Admin) */}
+        {(user.role === 'operador' || user.role === 'admin') && !viendoUsuarios && !element && !mostrarReporte && (
           <div className="card">
             <h3>➕ Cargar nuevo elemento</h3>
             <button
@@ -240,298 +187,19 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </div>
         )}
 
-        {/* Botón: Reporte de Materiales */}
-        {user.role !== 'lectura' && (
-          <div className="card">
-            <h3>📋 Reporte de Materiales</h3>
-            <button
-              onClick={() => setMostrarReporte(true)}
-              className="btn"
-              style={{ backgroundColor: '#17a2b8', color: 'white' }}
-            >
-              Ver Reporte por Móvil o Depósito
-            </button>
-          </div>
+        {/* Formulario de carga */}
+        {mostrarFormulario && (
+          <FormularioCarga
+            onClose={() => setMostrarFormulario(false)}
+            onCreate={(nuevo) => {
+              crearElemento(nuevo);
+              setMostrarFormulario(false);
+            }}
+          />
         )}
 
-{/* ✅ FORMULARIO DE CARGA CON CAMPOS DINÁMICOS */}
-{mostrarFormulario && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    padding: '20px'
-  }}>
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      width: '100%',
-      maxWidth: '500px',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.2)'
-    }}>
-      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-        <h2 style={{ margin: 0, color: '#333' }}>Cargar Nuevo Elemento</h2>
-      </div>
-
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.target);
-        const data = Object.fromEntries(formData);
-
-        // ✅ Lógica de ubicación
-        let ubicacion_tipo = data.ubicacion_tipo || null;
-        let ubicacion_id = null;
-        let baulera_numero = null;
-        let deposito_nombre = null;
-
-        if (ubicacion_tipo === 'Móvil') {
-          ubicacion_id = data.ubicacion_id;
-          baulera_numero = data.baulera_numero;
-        } else if (ubicacion_tipo === 'Depósito') {
-          deposito_nombre = data.deposito_nombre;
-        }
-
-        // ✅ Crear elemento
-        crearElemento({
-          codigo_qr: data.codigo_qr.trim().toUpperCase(),
-          nombre: data.nombre.trim(),
-          tipo: data.tipo.trim(),
-          estado: data.estado,
-          en_servicio: data.en_servicio === 'on',
-          ubicacion_tipo,
-          ubicacion_id: ubicacion_id || null,
-          baulera_numero: baulera_numero || null,
-          deposito_nombre: deposito_nombre || null,
-          caracteristicas: data.caracteristicas || null,
-          ultima_inspeccion: new Date().toISOString().split('T')[0]
-        });
-
-        setMostrarFormulario(false);
-      }} style={{ padding: '20px' }}>
-
-        {/* Código QR */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Código QR *</label>
-          <input
-            name="codigo_qr"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Nombre */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre *</label>
-          <input
-            name="nombre"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Tipo */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Tipo *</label>
-          <input
-            name="tipo"
-            required
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Estado */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Estado</label>
-          <select
-            name="estado"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="Bueno">Bueno</option>
-            <option value="Regular">Regular</option>
-            <option value="Malo">Malo</option>
-          </select>
-        </div>
-
-        {/* ¿En servicio? */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>¿En servicio?</label>
-          <input
-            type="checkbox"
-            name="en_servicio"
-            style={{ marginRight: '8px', transform: 'scale(1.4)' }}
-          />
-          <span>Sí</span>
-        </div>
-
-        {/* Ubicación */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Ubicación</label>
-          <select
-            name="ubicacion_tipo"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="Móvil">Móvil</option>
-            <option value="Depósito">Depósito</option>
-          </select>
-        </div>
-
-        {/* Si es Móvil → Número de móvil y Baulera */}
-        {/*
-          Este bloque no se puede hacer con HTML puro en un form simple,
-          pero podemos simularlo con campos que solo se muestran si se selecciona "Móvil"
-          → Lo haremos con un estado, pero por ahora usamos un workaround visual
-        */}
-
-        {/* Número de móvil (solo si ubicación es Móvil) */}
-        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Número de móvil (si es Móvil)</label>
-          <input
-            name="ubicacion_id"
-            placeholder="Ej: 3"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Baulera (opcional) */}
-        <div style={{ marginBottom: '16px', display: 'flex', flexDirection: 'column' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Baulera (opcional)</label>
-          <input
-            name="baulera_numero"
-            placeholder="Ej: 5"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          />
-        </div>
-
-        {/* Depósito (solo si ubicación es Depósito) */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre del depósito</label>
-          <select
-            name="deposito_nombre"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="Depósito 1">Depósito 1</option>
-            <option value="Depósito 2">Depósito 2</option>
-          </select>
-        </div>
-
-        {/* Características */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
-          <textarea
-            name="caracteristicas"
-            rows="3"
-            placeholder="Ej: 20 metros, caucho reforzado"
-            style={{
-              width: '100%',
-              padding: '12px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px',
-              resize: 'vertical'
-            }}
-          />
-        </div>
-
-        {/* Botones */}
-        <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-          <button
-            type="submit"
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            Guardar Elemento
-          </button>
-          <button
-            type="button"
-            onClick={() => setMostrarFormulario(false)}
-            style={{
-              flex: 1,
-              padding: '14px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              fontSize: '16px',
-              fontWeight: 'bold'
-            }}
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-)}
-
-        {/* ✅ GESTIÓN DE USUARIOS (solo Admin) */}
-        {user.role === 'admin' && (
+        {/* Gestionar Usuarios (Admin) */}
+        {user.role === 'admin' && !mostrarReporte && !mostrarFormulario && !element && (
           <div className="card">
             <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
             <button
@@ -547,58 +215,32 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
         {/* Panel: Gestionar Usuarios */}
         {viendoUsuarios && (
           <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
-            <div style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              marginBottom: '16px'
-            }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
               <button
                 onClick={() => setViendoUsuarios(false)}
-                style={{
-                  padding: '6px 12px',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
-                }}
+                style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 × Cerrar
               </button>
             </div>
-
             <button
               onClick={() => {
-                const legajo = prompt('Legajo (3 dígitos, ej: 001)');
-                if (!legajo || !/^\d{3}$/.test(legajo)) {
-                  alert('Legajo debe ser de 3 dígitos');
-                  return;
-                }
-                const nombre = prompt('Nombre');
-                if (!nombre) return;
-                const apellido = prompt('Apellido');
-                if (!apellido) return;
-                const password = prompt('Contraseña');
-                if (!password) return;
+                const legajo = prompt('Legajo (3 dígitos)');
+                if (!legajo || !/^\d{3}$/.test(legajo)) { alert('Legajo debe ser de 3 dígitos'); return; }
+                const nombre = prompt('Nombre'); if (!nombre) return;
+                const apellido = prompt('Apellido'); if (!apellido) return;
+                const password = prompt('Contraseña'); if (!password) return;
                 const rango = prompt('Rango (opcional)', '');
                 const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
                 const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
                 const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
                 const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
-
                 const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
-
                 const guardar = async () => {
                   const { error } = await supabase.from('usuarios').insert([nuevo]);
-                  if (error) {
-                    alert('Error: ' + error.message);
-                  } else {
-                    alert('✅ Usuario agregado');
-                    const { data } = await supabase.from('usuarios').select('*');
-                    setUsuarios(data);
-                  }
+                  if (error) { alert('Error: ' + error.message); } 
+                  else { alert('✅ Usuario agregado'); const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                 };
                 guardar();
               }}
@@ -607,58 +249,28 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             >
               + Agregar Usuario
             </button>
-
-            <div style={{
-              maxHeight: '400px',
-              overflowY: 'auto',
-              border: '1px solid #ddd',
-              borderRadius: '6px',
-              marginTop: '16px'
-            }}>
+            <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px', marginTop: '16px' }}>
               {usuarios.length === 0 ? (
                 <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
               ) : (
                 usuarios.map(u => (
-                  <div key={u.id} style={{
-                    padding: '14px',
-                    borderBottom: '1px solid #eee',
-                    backgroundColor: '#f9f9f9'
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      marginBottom: '8px'
-                    }}>
+                  <div key={u.id} style={{ padding: '14px', borderBottom: '1px solid #eee', backgroundColor: '#f9f9f9' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                       <strong>{u.nombre} {u.apellido} ({u.legajo})</strong>
                       <div style={{ display: 'flex', gap: '8px' }}>
                         <button
                           onClick={() => {
-                            const nuevoRol = prompt('Nuevo rol: lectura, operador, admin', u.role);
+                            const nuevoRol = prompt('Nuevo rol', u.role);
                             if (['lectura', 'operador', 'admin'].includes(nuevoRol)) {
                               const editar = async () => {
-                                const { error } = await supabase
-                                  .from('usuarios')
-                                  .update({ role: nuevoRol })
-                                  .eq('id', u.id);
-                                if (error) {
-                                  alert('Error: ' + error.message);
-                                } else {
-                                  const { data } = await supabase.from('usuarios').select('*');
-                                  setUsuarios(data);
-                                }
+                                const { error } = await supabase.from('usuarios').update({ role: nuevoRol }).eq('id', u.id);
+                                if (error) { alert('Error: ' + error.message); } 
+                                else { const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                               };
                               editar();
                             }
                           }}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#ffc107',
-                            color: 'black',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
+                          style={{ padding: '6px 10px', backgroundColor: '#ffc107', color: 'black', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                         >
                           ✏️
                         </button>
@@ -666,28 +278,14 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
                           onClick={() => {
                             if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
                               const borrar = async () => {
-                                const { error } = await supabase
-                                  .from('usuarios')
-                                  .delete()
-                                  .eq('id', u.id);
-                                if (error) {
-                                  alert('Error: ' + error.message);
-                                } else {
-                                  const { data } = await supabase.from('usuarios').select('*');
-                                  setUsuarios(data);
-                                }
+                                const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+                                if (error) { alert('Error: ' + error.message); } 
+                                else { const { data } = await supabase.from('usuarios').select('*'); setUsuarios(data); }
                               };
                               borrar();
                             }
                           }}
-                          style={{
-                            padding: '6px 10px',
-                            backgroundColor: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
+                          style={{ padding: '6px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
                         >
                           🗑️
                         </button>
@@ -706,48 +304,21 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
         )}
 
         {/* Ficha del elemento */}
-        {element && !viendoUsuarios && !mostrarFormulario && (
+        {element && !viendoUsuarios && !mostrarFormulario && !mostrarReporte && (
           <div className="card">
             <button
               onClick={() => setElement(null)}
-              style={{
-                color: 'blue',
-                background: 'none',
-                border: 'none',
-                fontSize: '16px',
-                cursor: 'pointer',
-                marginBottom: '16px'
-              }}
+              style={{ color: 'blue', background: 'none', border: 'none', fontSize: '16px', cursor: 'pointer', marginBottom: '16px' }}
             >
               ← Volver
             </button>
-
             <h2>{element.nombre}</h2>
             {element.foto_url && (
-              <img
-                src={element.foto_url}
-                alt={element.nombre}
-                style={{
-                  maxWidth: '100%',
-                  maxHeight: '200px',
-                  objectFit: 'contain',
-                  border: '1px solid #ddd',
-                  marginBottom: '16px'
-                }}
-              />
+              <img src={element.foto_url} alt={element.nombre} style={{ maxWidth: '100%', maxHeight: '200px', objectFit: 'contain', border: '1px solid #ddd', marginBottom: '16px' }} />
             )}
             <div style={{ lineHeight: '1.8' }}>
               <p><strong>Tipo:</strong> {element.tipo}</p>
-              <p>
-                <strong>Estado:</strong>{' '}
-                <span style={{
-                  color: element.estado === 'Bueno' ? 'green' :
-                         element.estado === 'Regular' ? 'orange' : 'red',
-                  fontWeight: 'bold'
-                }}>
-                  {element.estado}
-                </span>
-              </p>
+              <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
               <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
               <p><strong>Ubicación:</strong> 
                 {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
@@ -760,601 +331,586 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </div>
         )}
 
-{/* PANEL: REPORTE DE MATERIALES - ESTILO IMPRIMIBLE */}
-{mostrarReporte && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    padding: '20px'
-  }}>
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      width: '100%',
-      maxWidth: '900px',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-    }}>
-      {/* Encabezado */}
-      <div style={{
-        padding: '20px',
-        borderBottom: '3px solid #b91c1c',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#b91c1c',
-        color: 'white',
-        borderTopLeftRadius: '12px',
-        borderTopRightRadius: '12px'
-      }}>
-        <h2 style={{ margin: 0, fontSize: '20px' }}>📋 Reporte de Materiales</h2>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button
-            onClick={() => window.print()}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            🖨️ Imprimir Reporte
-          </button>
-          <button
-            onClick={() => setMostrarReporte(false)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#dc3545',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              cursor: 'pointer'
-            }}
-          >
-            × Cerrar
-          </button>
-        </div>
-      </div>
-
-      {/* Filtros */}
-      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ fontWeight: 'bold', marginRight: '12px' }}>Ver:</label>
-          <select
-            value={filtroUbicacion}
-            onChange={(e) => {
-              setFiltroUbicacion(e.target.value);
-              setMovilSeleccionado('');
-              setDepositoSeleccionado('');
-            }}
-            style={{
-              padding: '8px 12px',
-              borderRadius: '6px',
-              border: '1px solid #ccc',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="todos">Todos los elementos</option>
-            <option value="movil">Por Móvil</option>
-            <option value="deposito">Por Depósito</option>
-          </select>
-        </div>
-
-        {filtroUbicacion === 'movil' && (
-          <div>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-              Seleccionar Móvil
-            </label>
-            <select
-              value={movilSeleccionado}
-              onChange={(e) => setMovilSeleccionado(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
+        {/* Botón: Reporte de Materiales */}
+        {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
+          <div className="card">
+            <h3>📋 Reporte de Materiales</h3>
+            <button
+              onClick={() => setMostrarReporte(true)}
+              className="btn"
+              style={{ backgroundColor: '#17a2b8', color: 'white' }}
             >
-              <option value="">Todos los móviles</option>
-              {(() => {
-                const moviles = new Set();
-                Object.values(elementos).forEach(el => {
-                  if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
-                    moviles.add(el.ubicacion_id);
-                  }
-                });
-                return Array.from(moviles).sort().map(movil => (
-                  <option key={movil} value={movil}>Móvil {movil}</option>
-                ));
-              })()}
-            </select>
+              Ver Reporte de Materiales
+            </button>
           </div>
         )}
 
-        {filtroUbicacion === 'deposito' && (
-          <div>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-              Seleccionar Depósito
-            </label>
-            <select
-              value={depositoSeleccionado}
-              onChange={(e) => setDepositoSeleccionado(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
-            >
-              <option value="">Todos los depósitos</option>
-              <option value="Depósito 1">Depósito 1</option>
-              <option value="Depósito 2">Depósito 2</option>
-            </select>
-          </div>
-        )}
-      </div>
-
-      {/* Contenido imprimible */}
-      <div style={{ padding: '20px' }}>
-        {(() => {
-          let elementosFiltrados = Object.values(elementos);
-
-          if (filtroUbicacion === 'movil' && movilSeleccionado) {
-            elementosFiltrados = elementosFiltrados.filter(
-              el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
-            );
-          } else if (filtroUbicacion === 'movil') {
-            elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
-          }
-
-          if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
-            elementosFiltrados = elementosFiltrados.filter(
-              el => el.deposito_nombre === depositoSeleccionado
-            );
-          } else if (filtroUbicacion === 'deposito') {
-            elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
-          }
-
-          if (filtroUbicacion === 'todos' || !filtroUbicacion) {
-            elementosFiltrados = Object.values(elementos);
-          }
-
-          if (elementosFiltrados.length === 0) {
-            return <p>No hay elementos para mostrar.</p>;
-          }
-
-          // Estilos para la tabla
-          const tableHeaderStyle = {
-            padding: '12px',
-            textAlign: 'left',
-            backgroundColor: '#333',
-            color: 'white',
-            fontWeight: 'bold'
-          };
-
-          const tableCellStyle = {
-            padding: '10px',
-            border: '1px solid #ddd',
-            color: '#333'
-          };
-
-          // Agrupar por móvil
-          if (filtroUbicacion === 'movil' && !movilSeleccionado) {
-            const moviles = {};
-            elementosFiltrados.forEach(el => {
-              if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
-              moviles[el.ubicacion_id].push(el);
-            });
-
-            return Object.keys(moviles).sort().map(movil => (
-              <div key={movil} style={{ marginBottom: '40px' }}>
-                <h3 style={{
-                  backgroundColor: '#b91c1c',
-                  color: 'white',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  margin: '0 0 20px 0',
-                  textAlign: 'center',
-                  fontSize: '18px'
-                }}>
-                  Móvil {movil}
-                </h3>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  marginBottom: '30px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  <thead>
-                    <tr>
-                      <th style={tableHeaderStyle}>Nombre</th>
-                      <th style={tableHeaderStyle}>Tipo</th>
-                      <th style={tableHeaderStyle}>Estado</th>
-                      <th style={tableHeaderStyle}>Baulera</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {moviles[movil].map(el => (
-                      <tr key={el.codigo_qr} style={{
-                        backgroundColor: '#f9f9f9',
-                        borderBottom: '1px solid #ddd'
-                      }}>
-                        <td style={tableCellStyle}>{el.nombre}</td>
-                        <td style={tableCellStyle}>{el.tipo}</td>
-                        <td style={{
-                          ...tableCellStyle,
-                          color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                          fontWeight: 'bold'
-                        }}>
-                          {el.estado}
-                        </td>
-                        <td style={tableCellStyle}>{el.baulera_numero || '–'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ));
-          }
-
-          // Agrupar por depósito
-          if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
-            const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
-            elementosFiltrados.forEach(el => {
-              if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
-            });
-
-            return Object.keys(depositos).map(dep => (
-              <div key={dep} style={{ marginBottom: '40px' }}>
-                <h3 style={{
-                  backgroundColor: '#b91c1c',
-                  color: 'white',
-                  padding: '12px',
-                  borderRadius: '6px',
-                  margin: '0 0 20px 0',
-                  textAlign: 'center',
-                  fontSize: '18px'
-                }}>
-                  {dep}
-                </h3>
-                <table style={{
-                  width: '100%',
-                  borderCollapse: 'collapse',
-                  marginBottom: '30px',
-                  fontFamily: 'Arial, sans-serif'
-                }}>
-                  <thead>
-                    <tr>
-                      <th style={tableHeaderStyle}>Nombre</th>
-                      <th style={tableHeaderStyle}>Tipo</th>
-                      <th style={tableHeaderStyle}>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {depositos[dep].map(el => (
-                      <tr key={el.codigo_qr} style={{
-                        backgroundColor: '#f9f9f9',
-                        borderBottom: '1px solid #ddd'
-                      }}>
-                        <td style={tableCellStyle}>{el.nombre}</td>
-                        <td style={tableCellStyle}>{el.tipo}</td>
-                        <td style={{
-                          ...tableCellStyle,
-                          color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                          fontWeight: 'bold'
-                        }}>
-                          {el.estado}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ));
-          }
-
-          // Vista plana (todos o con filtro)
-          const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
-                         filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
-                         'Todos los elementos';
-
-          return (
-            <div>
-              <h3 style={{
+        {/* PANEL: REPORTE DE MATERIALES - ESTILO PANTALLA */}
+        {mostrarReporte && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              width: '100%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+            }}>
+              {/* Encabezado */}
+              <div style={{
+                padding: '20px',
+                borderBottom: '3px solid #b91c1c',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
                 backgroundColor: '#b91c1c',
                 color: 'white',
-                padding: '12px',
-                borderRadius: '6px',
-                margin: '0 0 20px 0',
-                textAlign: 'center',
-                fontSize: '18px'
+                borderTopLeftRadius: '12px',
+                borderTopRightRadius: '12px'
               }}>
-                {titulo}
-              </h3>
-              <table style={{
-                width: '100%',
-                borderCollapse: 'collapse',
-                fontFamily: 'Arial, sans-serif'
-              }}>
-                <thead>
-                  <tr>
-                    <th style={tableHeaderStyle}>Nombre</th>
-                    <th style={tableHeaderStyle}>Tipo</th>
-                    <th style={tableHeaderStyle}>Estado</th>
-                    <th style={tableHeaderStyle}>Ubicación</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {elementosFiltrados.map(el => (
-                    <tr key={el.codigo_qr} style={{
-                      backgroundColor: '#f9f9f9',
-                      borderBottom: '1px solid #ddd'
-                    }}>
-                      <td style={tableCellStyle}>{el.nombre}</td>
-                      <td style={tableCellStyle}>{el.tipo}</td>
-                      <td style={{
-                        ...tableCellStyle,
-                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                        fontWeight: 'bold'
+                <h2 style={{ margin: 0, fontSize: '20px' }}>📋 Reporte de Materiales</h2>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button
+                    onClick={() => window.print()}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#28a745',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    🖨️ Imprimir Reporte
+                  </button>
+                  <button
+                    onClick={() => setMostrarReporte(false)}
+                    style={{
+                      padding: '8px 16px',
+                      backgroundColor: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      fontSize: '14px',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    × Cerrar
+                  </button>
+                </div>
+              </div>
+
+              {/* Filtros */}
+              <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ fontWeight: 'bold', marginRight: '12px' }}>Ver:</label>
+                  <select
+                    value={filtroUbicacion}
+                    onChange={(e) => {
+                      setFiltroUbicacion(e.target.value);
+                      setMovilSeleccionado('');
+                      setDepositoSeleccionado('');
+                    }}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #ccc',
+                      fontSize: '16px'
+                    }}
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="todos">Todos los elementos</option>
+                    <option value="movil">Por Móvil</option>
+                    <option value="deposito">Por Depósito</option>
+                  </select>
+                </div>
+
+                {filtroUbicacion === 'movil' && (
+                  <div>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+                      Seleccionar Móvil
+                    </label>
+                    <select
+                      value={movilSeleccionado}
+                      onChange={(e) => setMovilSeleccionado(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ccc',
+                        borderRadius: '6px',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Todos los móviles</option>
+                      {(() => {
+                        const moviles = new Set();
+                        Object.values(elementos).forEach(el => {
+                          if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                            moviles.add(el.ubicacion_id);
+                          }
+                        });
+                        return Array.from(moviles).sort().map(movil => (
+                          <option key={movil} value={movil}>Móvil {movil}</option>
+                        ));
+                      })()}
+                    </select>
+                  </div>
+                )}
+
+                {filtroUbicacion === 'deposito' && (
+                  <div>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+                      Seleccionar Depósito
+                    </label>
+                    <select
+                      value={depositoSeleccionado}
+                      onChange={(e) => setDepositoSeleccionado(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '10px',
+                        border: '1px solid #ccc',
+                        borderRadius: '6px',
+                        fontSize: '16px'
+                      }}
+                    >
+                      <option value="">Todos los depósitos</option>
+                      <option value="Depósito 1">Depósito 1</option>
+                      <option value="Depósito 2">Depósito 2</option>
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Contenido en pantalla */}
+              <div style={{ padding: '20px' }}>
+                {(() => {
+                  let elementosFiltrados = Object.values(elementos);
+
+                  if (filtroUbicacion === 'movil' && movilSeleccionado) {
+                    elementosFiltrados = elementosFiltrados.filter(
+                      el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+                    );
+                  } else if (filtroUbicacion === 'movil') {
+                    elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
+                  }
+
+                  if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+                    elementosFiltrados = elementosFiltrados.filter(
+                      el => el.deposito_nombre === depositoSeleccionado
+                    );
+                  } else if (filtroUbicacion === 'deposito') {
+                    elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
+                  }
+
+                  if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+                    elementosFiltrados = Object.values(elementos);
+                  }
+
+                  if (elementosFiltrados.length === 0) {
+                    return <p>No hay elementos para mostrar.</p>;
+                  }
+
+                  const tableHeaderStyle = {
+                    padding: '12px',
+                    textAlign: 'left',
+                    backgroundColor: '#333',
+                    color: 'white',
+                    fontWeight: 'bold'
+                  };
+
+                  const tableCellStyle = {
+                    padding: '10px',
+                    border: '1px solid #ddd',
+                    color: '#333'
+                  };
+
+                  if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+                    const moviles = {};
+                    elementosFiltrados.forEach(el => {
+                      if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
+                      moviles[el.ubicacion_id].push(el);
+                    });
+
+                    return Object.keys(moviles).sort().map(movil => (
+                      <div key={movil} style={{ marginBottom: '40px' }}>
+                        <h3 style={{
+                          backgroundColor: '#b91c1c',
+                          color: 'white',
+                          padding: '12px',
+                          borderRadius: '6px',
+                          margin: '0 0 20px 0',
+                          textAlign: 'center',
+                          fontSize: '18px'
+                        }}>
+                          Móvil {movil}
+                        </h3>
+                        <table style={{
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          marginBottom: '30px',
+                          fontFamily: 'Arial, sans-serif'
+                        }}>
+                          <thead>
+                            <tr>
+                              <th style={tableHeaderStyle}>Nombre</th>
+                              <th style={tableHeaderStyle}>Tipo</th>
+                              <th style={tableHeaderStyle}>Estado</th>
+                              <th style={tableHeaderStyle}>Baulera</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {moviles[movil].map(el => (
+                              <tr key={el.codigo_qr} style={{
+                                backgroundColor: '#f9f9f9',
+                                borderBottom: '1px solid #ddd'
+                              }}>
+                                <td style={tableCellStyle}>{el.nombre}</td>
+                                <td style={tableCellStyle}>{el.tipo}</td>
+                                <td style={{
+                                  ...tableCellStyle,
+                                  color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                                  fontWeight: 'bold'
+                                }}>
+                                  {el.estado}
+                                </td>
+                                <td style={tableCellStyle}>{el.baulera_numero || '–'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ));
+                  }
+
+                  if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
+                    const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
+                    elementosFiltrados.forEach(el => {
+                      if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
+                    });
+
+                    return Object.keys(depositos).map(dep => (
+                      <div key={dep} style={{ marginBottom: '40px' }}>
+                        <h3 style={{
+                          backgroundColor: '#b91c1c',
+                          color: 'white',
+                          padding: '12px',
+                          borderRadius: '6px',
+                          margin: '0 0 20px 0',
+                          textAlign: 'center',
+                          fontSize: '18px'
+                        }}>
+                          {dep}
+                        </h3>
+                        <table style={{
+                          width: '100%',
+                          borderCollapse: 'collapse',
+                          marginBottom: '30px',
+                          fontFamily: 'Arial, sans-serif'
+                        }}>
+                          <thead>
+                            <tr>
+                              <th style={tableHeaderStyle}>Nombre</th>
+                              <th style={tableHeaderStyle}>Tipo</th>
+                              <th style={tableHeaderStyle}>Estado</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {depositos[dep].map(el => (
+                              <tr key={el.codigo_qr} style={{
+                                backgroundColor: '#f9f9f9',
+                                borderBottom: '1px solid #ddd'
+                              }}>
+                                <td style={tableCellStyle}>{el.nombre}</td>
+                                <td style={tableCellStyle}>{el.tipo}</td>
+                                <td style={{
+                                  ...tableCellStyle,
+                                  color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                                  fontWeight: 'bold'
+                                }}>
+                                  {el.estado}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ));
+                  }
+
+                  const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                                 filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                                 'Todos los elementos';
+
+                  return (
+                    <div>
+                      <h3 style={{
+                        backgroundColor: '#b91c1c',
+                        color: 'white',
+                        padding: '12px',
+                        borderRadius: '6px',
+                        margin: '0 0 20px 0',
+                        textAlign: 'center',
+                        fontSize: '18px'
                       }}>
-                        {el.estado}
-                      </td>
-                      <td style={tableCellStyle}>
-                        {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
-                          ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
-                          : el.deposito_nombre || '–'}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          );
-        })()}
-      </div>
-    </div>
-  </div>
-)}
-
-{/* Estilos para la tabla (inline) */}
-<script>
-  {(() => {
-    const tableHeaderStyle = {
-      padding: '12px',
-      textAlign: 'left',
-      backgroundColor: '#333',
-      color: 'white',
-      fontWeight: 'bold'
-    };
-    const tableCellStyle = {
-      padding: '10px',
-      border: '1px solid #ddd',
-      color: '#333'
-    };
-    window.tableHeaderStyle = tableHeaderStyle;
-    window.tableCellStyle = tableCellStyle;
-  })()}
-</script>
-
-
-{/* CONTENIDO IMPRIMIBLE - SOLO SE VE AL IMPRIMIR */}
-{mostrarReporte && (
-  <div
-    style={{
-      position: 'absolute',
-      left: '-9999px',
-      width: '1px'
-    }}
-    aria-hidden="true"
-  >
-    <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif' }}>
-      <h1 style={{ textAlign: 'center', color: '#b91c1c', marginBottom: '10px' }}>
-        Reporte de Materiales
-      </h1>
-      <p style={{ textAlign: 'center', color: '#555', fontSize: '14px', marginBottom: '30px' }}>
-        {new Date().toLocaleDateString('es-ES')}
-      </p>
-
-      {(() => {
-        let elementosFiltrados = Object.values(elementos);
-
-        if (filtroUbicacion === 'movil' && movilSeleccionado) {
-          elementosFiltrados = elementosFiltrados.filter(
-            el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
-          );
-        } else if (filtroUbicacion === 'movil') {
-          elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
-        }
-
-        if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
-          elementosFiltrados = elementosFiltrados.filter(
-            el => el.deposito_nombre === depositoSeleccionado
-          );
-        } else if (filtroUbicacion === 'deposito') {
-          elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
-        }
-
-        if (filtroUbicacion === 'todos' || !filtroUbicacion) {
-          elementosFiltrados = Object.values(elementos);
-        }
-
-        if (elementosFiltrados.length === 0) {
-          return <p>No hay elementos para mostrar.</p>;
-        }
-
-        const tableStyle = {
-          width: '100%',
-          borderCollapse: 'collapse',
-          marginTop: '20px',
-          fontSize: '12px'
-        };
-
-        const thStyle = {
-          backgroundColor: '#333',
-          color: 'white',
-          padding: '10px',
-          textAlign: 'left',
-          fontWeight: 'bold'
-        };
-
-        const tdStyle = {
-          padding: '8px',
-          border: '1px solid #ccc',
-          color: '#333'
-        };
-
-        const titleStyle = {
-          backgroundColor: '#b91c1c',
-          color: 'white',
-          padding: '12px',
-          borderRadius: '6px',
-          margin: '20px 0 10px 0',
-          textAlign: 'center',
-          fontSize: '16px'
-        };
-
-        // Agrupar por móvil
-        if (filtroUbicacion === 'movil' && !movilSeleccionado) {
-          const moviles = {};
-          elementosFiltrados.forEach(el => {
-            if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
-            moviles[el.ubicacion_id].push(el);
-          });
-
-          return Object.keys(moviles).sort().map(movil => (
-            <div key={movil}>
-              <h3 style={titleStyle}>Móvil {movil}</h3>
-              <table style={tableStyle}>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Nombre</th>
-                    <th style={thStyle}>Tipo</th>
-                    <th style={thStyle}>Estado</th>
-                    <th style={thStyle}>Baulera</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {moviles[movil].map(el => (
-                    <tr key={el.codigo_qr}>
-                      <td style={tdStyle}>{el.nombre}</td>
-                      <td style={tdStyle}>{el.tipo}</td>
-                      <td style={{
-                        ...tdStyle,
-                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                        fontWeight: 'bold'
+                        {titulo}
+                      </h3>
+                      <table style={{
+                        width: '100%',
+                        borderCollapse: 'collapse',
+                        fontFamily: 'Arial, sans-serif'
                       }}>
-                        {el.estado}
-                      </td>
-                      <td style={tdStyle}>{el.baulera_numero || '–'}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                        <thead>
+                          <tr>
+                            <th style={tableHeaderStyle}>Nombre</th>
+                            <th style={tableHeaderStyle}>Tipo</th>
+                            <th style={tableHeaderStyle}>Estado</th>
+                            <th style={tableHeaderStyle}>Ubicación</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {elementosFiltrados.map(el => (
+                            <tr key={el.codigo_qr} style={{
+                              backgroundColor: '#f9f9f9',
+                              borderBottom: '1px solid #ddd'
+                            }}>
+                              <td style={tableCellStyle}>{el.nombre}</td>
+                              <td style={tableCellStyle}>{el.tipo}</td>
+                              <td style={{
+                                ...tableCellStyle,
+                                color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                                fontWeight: 'bold'
+                              }}>
+                                {el.estado}
+                              </td>
+                              <td style={tableCellStyle}>
+                                {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
+                                  ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
+                                  : el.deposito_nombre || '–'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  );
+                })()}
+              </div>
             </div>
-          ));
-        }
-
-        // Agrupar por depósito
-        if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
-          const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
-          elementosFiltrados.forEach(el => {
-            if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
-          });
-
-          return Object.keys(depositos).map(dep => (
-            <div key={dep}>
-              <h3 style={titleStyle}>{dep}</h3>
-              <table style={tableStyle}>
-                <thead>
-                  <tr>
-                    <th style={thStyle}>Nombre</th>
-                    <th style={thStyle}>Tipo</th>
-                    <th style={thStyle}>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {depositos[dep].map(el => (
-                    <tr key={el.codigo_qr}>
-                      <td style={tdStyle}>{el.nombre}</td>
-                      <td style={tdStyle}>{el.tipo}</td>
-                      <td style={{
-                        ...tdStyle,
-                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                        fontWeight: 'bold'
-                      }}>
-                        {el.estado}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ));
-        }
-
-        // Vista plana
-        const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
-                       filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
-                       'Todos los elementos';
-
-        return (
-          <div>
-            <h3 style={titleStyle}>{titulo}</h3>
-            <table style={tableStyle}>
-              <thead>
-                <tr>
-                  <th style={thStyle}>Nombre</th>
-                  <th style={thStyle}>Tipo</th>
-                  <th style={thStyle}>Estado</th>
-                  <th style={thStyle}>Ubicación</th>
-                </tr>
-              </thead>
-              <tbody>
-                {elementosFiltrados.map(el => (
-                  <tr key={el.codigo_qr}>
-                    <td style={tdStyle}>{el.nombre}</td>
-                    <td style={tdStyle}>{el.tipo}</td>
-                    <td style={{
-                      ...tdStyle,
-                      color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
-                      fontWeight: 'bold'
-                    }}>
-                      {el.estado}
-                    </td>
-                    <td style={tdStyle}>
-                      {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
-                        ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
-                        : el.deposito_nombre || '–'}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
-        );
-      })()}
-    </div>
-  </div>
-)}
+        )}
 
+        {/* CONTENIDO IMPRIMIBLE - SOLO SE VE AL IMPRIMIR */}
+        {mostrarReporte && (
+          <div
+            style={{
+              position: 'absolute',
+              left: '-9999px',
+              width: '1px'
+            }}
+            aria-hidden="true"
+          >
+            <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif' }}>
+              <h1 style={{ textAlign: 'center', color: '#b91c1c', marginBottom: '10px' }}>
+                Reporte de Materiales
+              </h1>
+              <p style={{ textAlign: 'center', color: '#555', fontSize: '14px', marginBottom: '30px' }}>
+                {new Date().toLocaleDateString('es-ES')}
+              </p>
+
+              {(() => {
+                let elementosFiltrados = Object.values(elementos);
+
+                if (filtroUbicacion === 'movil' && movilSeleccionado) {
+                  elementosFiltrados = elementosFiltrados.filter(
+                    el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+                  );
+                } else if (filtroUbicacion === 'movil') {
+                  elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
+                }
+
+                if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+                  elementosFiltrados = elementosFiltrados.filter(
+                    el => el.deposito_nombre === depositoSeleccionado
+                  );
+                } else if (filtroUbicacion === 'deposito') {
+                  elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
+                }
+
+                if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+                  elementosFiltrados = Object.values(elementos);
+                }
+
+                if (elementosFiltrados.length === 0) {
+                  return <p>No hay elementos para mostrar.</p>;
+                }
+
+                const tableStyle = {
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  marginTop: '20px',
+                  fontSize: '12px'
+                };
+
+                const thStyle = {
+                  backgroundColor: '#333',
+                  color: 'white',
+                  padding: '10px',
+                  textAlign: 'left',
+                  fontWeight: 'bold'
+                };
+
+                const tdStyle = {
+                  padding: '8px',
+                  border: '1px solid #ccc',
+                  color: '#333'
+                };
+
+                const titleStyle = {
+                  backgroundColor: '#b91c1c',
+                  color: 'white',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  margin: '20px 0 10px 0',
+                  textAlign: 'center',
+                  fontSize: '16px'
+                };
+
+                if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+                  const moviles = {};
+                  elementosFiltrados.forEach(el => {
+                    if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
+                    moviles[el.ubicacion_id].push(el);
+                  });
+
+                  return Object.keys(moviles).sort().map(movil => (
+                    <div key={movil}>
+                      <h3 style={titleStyle}>Móvil {movil}</h3>
+                      <table style={tableStyle}>
+                        <thead>
+                          <tr>
+                            <th style={thStyle}>Nombre</th>
+                            <th style={thStyle}>Tipo</th>
+                            <th style={thStyle}>Estado</th>
+                            <th style={thStyle}>Baulera</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {moviles[movil].map(el => (
+                            <tr key={el.codigo_qr}>
+                              <td style={tdStyle}>{el.nombre}</td>
+                              <td style={tdStyle}>{el.tipo}</td>
+                              <td style={{
+                                ...tdStyle,
+                                color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                                fontWeight: 'bold'
+                              }}>
+                                {el.estado}
+                              </td>
+                              <td style={tdStyle}>{el.baulera_numero || '–'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ));
+                }
+
+                if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
+                  const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
+                  elementosFiltrados.forEach(el => {
+                    if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
+                  });
+
+                  return Object.keys(depositos).map(dep => (
+                    <div key={dep}>
+                      <h3 style={titleStyle}>{dep}</h3>
+                      <table style={tableStyle}>
+                        <thead>
+                          <tr>
+                            <th style={thStyle}>Nombre</th>
+                            <th style={thStyle}>Tipo</th>
+                            <th style={thStyle}>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {depositos[dep].map(el => (
+                            <tr key={el.codigo_qr}>
+                              <td style={tdStyle}>{el.nombre}</td>
+                              <td style={tdStyle}>{el.tipo}</td>
+                              <td style={{
+                                ...tdStyle,
+                                color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                                fontWeight: 'bold'
+                              }}>
+                                {el.estado}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ));
+                }
+
+                const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                               filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                               'Todos los elementos';
+
+                return (
+                  <div>
+                    <h3 style={titleStyle}>{titulo}</h3>
+                    <table style={tableStyle}>
+                      <thead>
+                        <tr>
+                          <th style={thStyle}>Nombre</th>
+                          <th style={thStyle}>Tipo</th>
+                          <th style={thStyle}>Estado</th>
+                          <th style={thStyle}>Ubicación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {elementosFiltrados.map(el => (
+                          <tr key={el.codigo_qr}>
+                            <td style={tdStyle}>{el.nombre}</td>
+                            <td style={tdStyle}>{el.tipo}</td>
+                            <td style={{
+                              ...tdStyle,
+                              color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                              fontWeight: 'bold'
+                            }}>
+                              {el.estado}
+                            </td>
+                            <td style={tdStyle}>
+                              {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
+                                ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
+                                : el.deposito_nombre || '–'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
