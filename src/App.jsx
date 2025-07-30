@@ -1,3 +1,5 @@
+
+
 import { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 
@@ -9,6 +11,13 @@ function App() {
   const [usuarios, setUsuarios] = useState([]);
   const [viendoUsuarios, setViendoUsuarios] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
+
+
+const [mostrarReporte, setMostrarReporte] = useState(false);
+const [filtroUbicacion, setFiltroUbicacion] = useState(''); // 'todos', 'movil', 'deposito'
+const [movilSeleccionado, setMovilSeleccionado] = useState('');
+const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
+
 
   // Cargar elementos
   useEffect(() => {
@@ -227,6 +236,20 @@ function App() {
               style={{ backgroundColor: '#28a745', color: 'white' }}
             >
               + Cargar elemento nuevo
+            </button>
+          </div>
+        )}
+
+        {/* Botón: Reporte de Materiales */}
+        {user.role !== 'lectura' && (
+          <div className="card">
+            <h3>📋 Reporte de Materiales</h3>
+            <button
+              onClick={() => setMostrarReporte(true)}
+              className="btn"
+              style={{ backgroundColor: '#17a2b8', color: 'white' }}
+            >
+              Ver Reporte por Móvil o Depósito
             </button>
           </div>
         )}
@@ -736,6 +759,245 @@ function App() {
             </div>
           </div>
         )}
+
+{/* PANEL: REPORTE DE MATERIALES */}
+{mostrarReporte && (
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    padding: '20px'
+  }}>
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      width: '100%',
+      maxWidth: '700px',
+      maxHeight: '90vh',
+      overflowY: 'auto',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+    }}>
+      {/* Encabezado */}
+      <div style={{
+        padding: '20px',
+        borderBottom: '1px solid #eee',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h2 style={{ margin: 0, color: '#17a2b8' }}>📋 Reporte de Materiales</h2>
+        <button
+          onClick={() => setMostrarReporte(false)}
+          style={{
+            padding: '6px 12px',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          × Cerrar
+        </button>
+      </div>
+
+      {/* Filtros */}
+      <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ fontWeight: 'bold', marginRight: '12px' }}>Ver:</label>
+          <select
+            value={filtroUbicacion}
+            onChange={(e) => {
+              setFiltroUbicacion(e.target.value);
+              setMovilSeleccionado('');
+              setDepositoSeleccionado('');
+            }}
+            style={{
+              padding: '8px 12px',
+              borderRadius: '6px',
+              border: '1px solid #ccc',
+              fontSize: '16px'
+            }}
+          >
+            <option value="">Seleccionar...</option>
+            <option value="todos">Todos los elementos</option>
+            <option value="movil">Por Móvil</option>
+            <option value="deposito">Por Depósito</option>
+          </select>
+        </div>
+
+        {/* Si elige Móvil */}
+        {filtroUbicacion === 'movil' && (
+          <div>
+            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+              Seleccionar Móvil
+            </label>
+            <select
+              value={movilSeleccionado}
+              onChange={(e) => setMovilSeleccionado(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
+            >
+              <option value="">Todos los móviles</option>
+              {(() => {
+                const moviles = new Set();
+                Object.values(elementos).forEach(el => {
+                  if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                    moviles.add(el.ubicacion_id);
+                  }
+                });
+                return Array.from(moviles).sort().map(movil => (
+                  <option key={movil} value={movil}>Móvil {movil}</option>
+                ));
+              })()}
+            </select>
+          </div>
+        )}
+
+        {/* Si elige Depósito */}
+        {filtroUbicacion === 'deposito' && (
+          <div>
+            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+              Seleccionar Depósito
+            </label>
+            <select
+              value={depositoSeleccionado}
+              onChange={(e) => setDepositoSeleccionado(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
+            >
+              <option value="">Todos los depósitos</option>
+              <option value="Depósito 1">Depósito 1</option>
+              <option value="Depósito 2">Depósito 2</option>
+            </select>
+          </div>
+        )}
+      </div>
+
+      {/* Resultados */}
+      <div style={{ padding: '20px' }}>
+        {(() => {
+          let elementosFiltrados = Object.values(elementos);
+
+          // Filtrar por móvil
+          if (filtroUbicacion === 'movil' && movilSeleccionado) {
+            elementosFiltrados = elementosFiltrados.filter(
+              el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+            );
+          } else if (filtroUbicacion === 'movil') {
+            elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
+          }
+
+          // Filtrar por depósito
+          if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+            elementosFiltrados = elementosFiltrados.filter(
+              el => el.deposito_nombre === depositoSeleccionado
+            );
+          } else if (filtroUbicacion === 'deposito') {
+            elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
+          }
+
+          // Si no hay filtro, mostrar todos
+          if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+            elementosFiltrados = Object.values(elementos);
+          }
+
+          if (elementosFiltrados.length === 0) {
+            return <p>No hay elementos para mostrar.</p>;
+          }
+
+          // Agrupar por móvil si no hay filtro específico
+          if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+            const moviles = {};
+            elementosFiltrados.forEach(el => {
+              if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
+              moviles[el.ubicacion_id].push(el);
+            });
+
+            return Object.keys(moviles).sort().map(movil => (
+              <div key={movil} style={{ marginBottom: '24px' }}>
+                <h3 style={{ color: '#007bff', margin: '0 0 12px 0' }}>Móvil {movil}</h3>
+                <ul style={{ paddingLeft: '20px' }}>
+                  {moviles[movil].map(el => (
+                    <li key={el.codigo_qr} style={{ marginBottom: '6px' }}>
+                      <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
+                      {el.baulera_numero && <> – Baulera: {el.baulera_numero}</>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ));
+          }
+
+          // Agrupar por depósito si no hay filtro específico
+          if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
+            const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
+            elementosFiltrados.forEach(el => {
+              if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
+            });
+
+            return Object.keys(depositos).map(dep => (
+              <div key={dep} style={{ marginBottom: '24px' }}>
+                <h3 style={{ color: '#28a745', margin: '0 0 12px 0' }}>{dep}</h3>
+                <ul style={{ paddingLeft: '20px' }}>
+                  {depositos[dep].length > 0 ? (
+                    depositos[dep].map(el => (
+                      <li key={el.codigo_qr} style={{ marginBottom: '6px' }}>
+                        <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
+                      </li>
+                    ))
+                  ) : (
+                    <li style={{ color: '#666' }}>Sin elementos</li>
+                  )}
+                </ul>
+              </div>
+            ));
+          }
+
+          // Si hay filtro específico o "todos", mostrar lista plana
+          return (
+            <div>
+              <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>
+                {filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                 filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                 'Todos los elementos'}
+              </h3>
+              <ul style={{ paddingLeft: '20px' }}>
+                {elementosFiltrados.map(el => (
+                  <li key={el.codigo_qr} style={{ marginBottom: '8px' }}>
+                    <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
+                    {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id && <> – Móvil {el.ubicacion_id}</>}
+                    {el.baulera_numero && <> (Baulera {el.baulera_numero})</>}
+                    {el.deposito_nombre && <> – {el.deposito_nombre}</>}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })()}
+      </div>
+    </div>
+  </div>
+)}
+
+
       </div>
     </>
   );
