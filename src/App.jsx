@@ -20,7 +20,7 @@ function App() {
 const abrirReporteEnPestaña = () => {
   const elementosArray = Object.values(elementos);
 
-  // Filtrar y agrupar según filtros actuales (simulamos el estado)
+  // Filtrar según estado actual
   let elementosFiltrados = elementosArray;
 
   if (filtroUbicacion === 'movil' && movilSeleccionado) {
@@ -39,7 +39,8 @@ const abrirReporteEnPestaña = () => {
     elementosFiltrados = elementosArray.filter(el => el.deposito_nombre);
   }
 
-  const contenido = `
+  // Usamos 'let' para poder modificar 'contenido'
+  let contenido = `
     <html>
     <head>
       <title>Reporte de Materiales</title>
@@ -69,7 +70,7 @@ const abrirReporteEnPestaña = () => {
       <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
   `;
 
-  // Agrupar por móvil si es necesario
+  // Agrupar por móvil
   if (filtroUbicacion === 'movil' && !movilSeleccionado) {
     const moviles = {};
     elementosFiltrados.forEach(el => {
@@ -81,7 +82,14 @@ const abrirReporteEnPestaña = () => {
       contenido += `<h3>Móvil ${movil}</h3>`;
       contenido += `
         <table>
-          <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Baulera</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Baulera</th>
+            </tr>
+          </thead>
           <tbody>
       `;
       moviles[movil].forEach(el => {
@@ -89,7 +97,9 @@ const abrirReporteEnPestaña = () => {
           <tr>
             <td>${el.nombre}</td>
             <td>${el.tipo}</td>
-            <td style="color: ${el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'}; font-weight:bold;">
+            <td style="color: ${
+              el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+            }; font-weight:bold;">
               ${el.estado}
             </td>
             <td>${el.baulera_numero || '–'}</td>
@@ -111,7 +121,13 @@ const abrirReporteEnPestaña = () => {
       contenido += `<h3>${dep}</h3>`;
       contenido += `
         <table>
-          <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th></tr></thead>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
           <tbody>
       `;
       depositos[dep].forEach(el => {
@@ -119,7 +135,9 @@ const abrirReporteEnPestaña = () => {
           <tr>
             <td>${el.nombre}</td>
             <td>${el.tipo}</td>
-            <td style="color: ${el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'}; font-weight:bold;">
+            <td style="color: ${
+              el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+            }; font-weight:bold;">
               ${el.estado}
             </td>
           </tr>
@@ -138,7 +156,14 @@ const abrirReporteEnPestaña = () => {
     contenido += `<h3>${titulo}</h3>`;
     contenido += `
       <table>
-        <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Ubicación</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Ubicación</th>
+          </tr>
+        </thead>
         <tbody>
     `;
     elementosFiltrados.forEach(el => {
@@ -150,7 +175,9 @@ const abrirReporteEnPestaña = () => {
         <tr>
           <td>${el.nombre}</td>
           <td>${el.tipo}</td>
-          <td style="color: ${el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'}; font-weight:bold;">
+          <td style="color: ${
+            el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+          }; font-weight:bold;">
             ${el.estado}
           </td>
           <td>${ubicacion}</td>
@@ -160,6 +187,7 @@ const abrirReporteEnPestaña = () => {
     contenido += `</tbody></table>`;
   }
 
+  // Cierre del HTML
   contenido += `
       <div class="footer">
         Reporte generado desde BomberoStock
