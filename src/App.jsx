@@ -760,7 +760,7 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </div>
         )}
 
-{/* PANEL: REPORTE DE MATERIALES */}
+{/* PANEL: REPORTE DE MATERIALES - ESTILO IMPRIMIBLE */}
 {mostrarReporte && (
   <div style={{
     position: 'fixed',
@@ -779,7 +779,7 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
       backgroundColor: 'white',
       borderRadius: '12px',
       width: '100%',
-      maxWidth: '700px',
+      maxWidth: '900px',
       maxHeight: '90vh',
       overflowY: 'auto',
       boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
@@ -787,25 +787,48 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
       {/* Encabezado */}
       <div style={{
         padding: '20px',
-        borderBottom: '1px solid #eee',
+        borderBottom: '3px solid #b91c1c',
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        backgroundColor: '#b91c1c',
+        color: 'white',
+        borderTopLeftRadius: '12px',
+        borderTopRightRadius: '12px'
       }}>
-        <h2 style={{ margin: 0, color: '#17a2b8' }}>📋 Reporte de Materiales</h2>
-        <button
-          onClick={() => setMostrarReporte(false)}
-          style={{
-            padding: '6px 12px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          × Cerrar
-        </button>
+        <h2 style={{ margin: 0, fontSize: '20px' }}>📋 Reporte de Materiales</h2>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => window.print()}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            🖨️ Imprimir
+          </button>
+          <button
+            onClick={() => setMostrarReporte(false)}
+            style={{
+              padding: '8px 16px',
+              backgroundColor: '#dc3545',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >
+            × Cerrar
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -833,7 +856,6 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </select>
         </div>
 
-        {/* Si elige Móvil */}
         {filtroUbicacion === 'movil' && (
           <div>
             <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
@@ -866,7 +888,6 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
           </div>
         )}
 
-        {/* Si elige Depósito */}
         {filtroUbicacion === 'deposito' && (
           <div>
             <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
@@ -891,12 +912,11 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
         )}
       </div>
 
-      {/* Resultados */}
+      {/* Contenido imprimible */}
       <div style={{ padding: '20px' }}>
         {(() => {
           let elementosFiltrados = Object.values(elementos);
 
-          // Filtrar por móvil
           if (filtroUbicacion === 'movil' && movilSeleccionado) {
             elementosFiltrados = elementosFiltrados.filter(
               el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
@@ -905,7 +925,6 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
           }
 
-          // Filtrar por depósito
           if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
             elementosFiltrados = elementosFiltrados.filter(
               el => el.deposito_nombre === depositoSeleccionado
@@ -914,7 +933,6 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
           }
 
-          // Si no hay filtro, mostrar todos
           if (filtroUbicacion === 'todos' || !filtroUbicacion) {
             elementosFiltrados = Object.values(elementos);
           }
@@ -923,7 +941,22 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             return <p>No hay elementos para mostrar.</p>;
           }
 
-          // Agrupar por móvil si no hay filtro específico
+          // Estilos para la tabla
+          const tableHeaderStyle = {
+            padding: '12px',
+            textAlign: 'left',
+            backgroundColor: '#333',
+            color: 'white',
+            fontWeight: 'bold'
+          };
+
+          const tableCellStyle = {
+            padding: '10px',
+            border: '1px solid #ddd',
+            color: '#333'
+          };
+
+          // Agrupar por móvil
           if (filtroUbicacion === 'movil' && !movilSeleccionado) {
             const moviles = {};
             elementosFiltrados.forEach(el => {
@@ -932,21 +965,57 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             });
 
             return Object.keys(moviles).sort().map(movil => (
-              <div key={movil} style={{ marginBottom: '24px' }}>
-                <h3 style={{ color: '#007bff', margin: '0 0 12px 0' }}>Móvil {movil}</h3>
-                <ul style={{ paddingLeft: '20px' }}>
-                  {moviles[movil].map(el => (
-                    <li key={el.codigo_qr} style={{ marginBottom: '6px' }}>
-                      <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
-                      {el.baulera_numero && <> – Baulera: {el.baulera_numero}</>}
-                    </li>
-                  ))}
-                </ul>
+              <div key={movil} style={{ marginBottom: '40px' }}>
+                <h3 style={{
+                  backgroundColor: '#b91c1c',
+                  color: 'white',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  margin: '0 0 20px 0',
+                  textAlign: 'center',
+                  fontSize: '18px'
+                }}>
+                  Móvil {movil}
+                </h3>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  marginBottom: '30px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  <thead>
+                    <tr>
+                      <th style={tableHeaderStyle}>Nombre</th>
+                      <th style={tableHeaderStyle}>Tipo</th>
+                      <th style={tableHeaderStyle}>Estado</th>
+                      <th style={tableHeaderStyle}>Baulera</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {moviles[movil].map(el => (
+                      <tr key={el.codigo_qr} style={{
+                        backgroundColor: '#f9f9f9',
+                        borderBottom: '1px solid #ddd'
+                      }}>
+                        <td style={tableCellStyle}>{el.nombre}</td>
+                        <td style={tableCellStyle}>{el.tipo}</td>
+                        <td style={{
+                          ...tableCellStyle,
+                          color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                          fontWeight: 'bold'
+                        }}>
+                          {el.estado}
+                        </td>
+                        <td style={tableCellStyle}>{el.baulera_numero || '–'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ));
           }
 
-          // Agrupar por depósito si no hay filtro específico
+          // Agrupar por depósito
           if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
             const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
             elementosFiltrados.forEach(el => {
@@ -954,41 +1023,109 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
             });
 
             return Object.keys(depositos).map(dep => (
-              <div key={dep} style={{ marginBottom: '24px' }}>
-                <h3 style={{ color: '#28a745', margin: '0 0 12px 0' }}>{dep}</h3>
-                <ul style={{ paddingLeft: '20px' }}>
-                  {depositos[dep].length > 0 ? (
-                    depositos[dep].map(el => (
-                      <li key={el.codigo_qr} style={{ marginBottom: '6px' }}>
-                        <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
-                      </li>
-                    ))
-                  ) : (
-                    <li style={{ color: '#666' }}>Sin elementos</li>
-                  )}
-                </ul>
+              <div key={dep} style={{ marginBottom: '40px' }}>
+                <h3 style={{
+                  backgroundColor: '#b91c1c',
+                  color: 'white',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  margin: '0 0 20px 0',
+                  textAlign: 'center',
+                  fontSize: '18px'
+                }}>
+                  {dep}
+                </h3>
+                <table style={{
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  marginBottom: '30px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  <thead>
+                    <tr>
+                      <th style={tableHeaderStyle}>Nombre</th>
+                      <th style={tableHeaderStyle}>Tipo</th>
+                      <th style={tableHeaderStyle}>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {depositos[dep].map(el => (
+                      <tr key={el.codigo_qr} style={{
+                        backgroundColor: '#f9f9f9',
+                        borderBottom: '1px solid #ddd'
+                      }}>
+                        <td style={tableCellStyle}>{el.nombre}</td>
+                        <td style={tableCellStyle}>{el.tipo}</td>
+                        <td style={{
+                          ...tableCellStyle,
+                          color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                          fontWeight: 'bold'
+                        }}>
+                          {el.estado}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             ));
           }
 
-          // Si hay filtro específico o "todos", mostrar lista plana
+          // Vista plana (todos o con filtro)
+          const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                         filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                         'Todos los elementos';
+
           return (
             <div>
-              <h3 style={{ color: '#333', margin: '0 0 12px 0' }}>
-                {filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
-                 filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
-                 'Todos los elementos'}
+              <h3 style={{
+                backgroundColor: '#b91c1c',
+                color: 'white',
+                padding: '12px',
+                borderRadius: '6px',
+                margin: '0 0 20px 0',
+                textAlign: 'center',
+                fontSize: '18px'
+              }}>
+                {titulo}
               </h3>
-              <ul style={{ paddingLeft: '20px' }}>
-                {elementosFiltrados.map(el => (
-                  <li key={el.codigo_qr} style={{ marginBottom: '8px' }}>
-                    <strong>{el.nombre}</strong> ({el.tipo}) – {el.estado}
-                    {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id && <> – Móvil {el.ubicacion_id}</>}
-                    {el.baulera_numero && <> (Baulera {el.baulera_numero})</>}
-                    {el.deposito_nombre && <> – {el.deposito_nombre}</>}
-                  </li>
-                ))}
-              </ul>
+              <table style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontFamily: 'Arial, sans-serif'
+              }}>
+                <thead>
+                  <tr>
+                    <th style={tableHeaderStyle}>Nombre</th>
+                    <th style={tableHeaderStyle}>Tipo</th>
+                    <th style={tableHeaderStyle}>Estado</th>
+                    <th style={tableHeaderStyle}>Ubicación</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {elementosFiltrados.map(el => (
+                    <tr key={el.codigo_qr} style={{
+                      backgroundColor: '#f9f9f9',
+                      borderBottom: '1px solid #ddd'
+                    }}>
+                      <td style={tableCellStyle}>{el.nombre}</td>
+                      <td style={tableCellStyle}>{el.tipo}</td>
+                      <td style={{
+                        ...tableCellStyle,
+                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                        fontWeight: 'bold'
+                      }}>
+                        {el.estado}
+                      </td>
+                      <td style={tableCellStyle}>
+                        {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
+                          ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
+                          : el.deposito_nombre || '–'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           );
         })()}
@@ -996,6 +1133,26 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
     </div>
   </div>
 )}
+
+{/* Estilos para la tabla (inline) */}
+<script>
+  {(() => {
+    const tableHeaderStyle = {
+      padding: '12px',
+      textAlign: 'left',
+      backgroundColor: '#333',
+      color: 'white',
+      fontWeight: 'bold'
+    };
+    const tableCellStyle = {
+      padding: '10px',
+      border: '1px solid #ddd',
+      color: '#333'
+    };
+    window.tableHeaderStyle = tableHeaderStyle;
+    window.tableCellStyle = tableCellStyle;
+  })()}
+</script>
 
 
       </div>
