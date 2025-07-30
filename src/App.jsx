@@ -329,17 +329,87 @@ function App() {
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
 
-        {/* Botón de escaneo */}
-        <button
-          onClick={() => {
-            const code = prompt('Ingresa el código QR (ej: MAT-001)');
-            if (code) { setSearchCode(code); setTimeout(handleSearch, 100); }
-          }}
-          className="btn"
-          style={{ backgroundColor: '#007bff', color: 'white' }}
-        >
-          📷 Escanear QR
-        </button>
+        {/* Botón: Escanear QR con cámara */}
+<button
+  onClick={async () => {
+    // Cargar Html5Qrcode dinámicamente solo cuando se necesita
+    const script = document.createElement('script');
+    script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+    script.onload = () => {
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+      modal.style.display = 'flex';
+      modal.style.flexDirection = 'column';
+      modal.style.zIndex = '9999';
+      modal.style.justifyContent = 'space-between';
+
+      const container = document.createElement('div');
+      container.id = 'qr-reader';
+      container.style.padding = '20px';
+      container.style.flex = '1';
+      container.style.display = 'flex';
+      container.style.justifyContent = 'center';
+      container.style.alignItems = 'center';
+
+      const controls = document.createElement('div');
+      controls.style.padding = '16px';
+      controls.style.display = 'flex';
+      controls.style.gap = '12px';
+      controls.style.justifyContent = 'center';
+
+      const closeBtn = document.createElement('button');
+      closeBtn.textContent = 'Cancelar';
+      closeBtn.style.padding = '12px 24px';
+      closeBtn.style.backgroundColor = '#dc3545';
+      closeBtn.style.color = 'white';
+      closeBtn.style.border = 'none';
+      closeBtn.style.borderRadius = '6px';
+      closeBtn.style.cursor = 'pointer';
+      closeBtn.onclick = () => {
+        try {
+          window.html5QrcodeScanner.clear();
+        } catch (e) {}
+        document.body.removeChild(modal);
+      };
+
+      controls.appendChild(closeBtn);
+      modal.appendChild(container);
+      modal.appendChild(controls);
+      document.body.appendChild(modal);
+
+      // Iniciar escáner
+      function onScanSuccess(decodedText) {
+        document.body.removeChild(modal);
+        setSearchCode(decodedText);
+        handleSearch();
+      }
+
+      function onScanFailure(error) {
+        console.warn('Error al escanear:', error);
+      }
+
+      window.html5QrcodeScanner = new Html5QrcodeScanner(
+        'qr-reader',
+        { fps: 10, qrbox: 250, facingMode: 'environment' },
+        false
+      );
+      window.html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    };
+    script.onerror = () => {
+      alert('Error al cargar el escáner. Reintenta.');
+    };
+    document.head.appendChild(script);
+  }}
+  className="btn"
+  style={{ backgroundColor: '#007bff', color: 'white' }}
+>
+  📷 Escanear QR con Cámara
+</button>
 
         {/* Búsqueda */}
         <div className="card">
