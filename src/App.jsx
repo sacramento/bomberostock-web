@@ -811,7 +811,7 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
               cursor: 'pointer'
             }}
           >
-            🖨️ Imprimir
+            🖨️ Imprimir Reporte
           </button>
           <button
             onClick={() => setMostrarReporte(false)}
@@ -1154,6 +1154,206 @@ const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
   })()}
 </script>
 
+
+{/* CONTENIDO IMPRIMIBLE - SOLO SE VE AL IMPRIMIR */}
+{mostrarReporte && (
+  <div
+    style={{
+      position: 'absolute',
+      left: '-9999px',
+      width: '1px'
+    }}
+    aria-hidden="true"
+  >
+    <div style={{ padding: '30px', fontFamily: 'Arial, sans-serif' }}>
+      <h1 style={{ textAlign: 'center', color: '#b91c1c', marginBottom: '10px' }}>
+        Reporte de Materiales
+      </h1>
+      <p style={{ textAlign: 'center', color: '#555', fontSize: '14px', marginBottom: '30px' }}>
+        {new Date().toLocaleDateString('es-ES')}
+      </p>
+
+      {(() => {
+        let elementosFiltrados = Object.values(elementos);
+
+        if (filtroUbicacion === 'movil' && movilSeleccionado) {
+          elementosFiltrados = elementosFiltrados.filter(
+            el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+          );
+        } else if (filtroUbicacion === 'movil') {
+          elementosFiltrados = elementosFiltrados.filter(el => el.ubicacion_tipo === 'Móvil');
+        }
+
+        if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+          elementosFiltrados = elementosFiltrados.filter(
+            el => el.deposito_nombre === depositoSeleccionado
+          );
+        } else if (filtroUbicacion === 'deposito') {
+          elementosFiltrados = elementosFiltrados.filter(el => el.deposito_nombre);
+        }
+
+        if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+          elementosFiltrados = Object.values(elementos);
+        }
+
+        if (elementosFiltrados.length === 0) {
+          return <p>No hay elementos para mostrar.</p>;
+        }
+
+        const tableStyle = {
+          width: '100%',
+          borderCollapse: 'collapse',
+          marginTop: '20px',
+          fontSize: '12px'
+        };
+
+        const thStyle = {
+          backgroundColor: '#333',
+          color: 'white',
+          padding: '10px',
+          textAlign: 'left',
+          fontWeight: 'bold'
+        };
+
+        const tdStyle = {
+          padding: '8px',
+          border: '1px solid #ccc',
+          color: '#333'
+        };
+
+        const titleStyle = {
+          backgroundColor: '#b91c1c',
+          color: 'white',
+          padding: '12px',
+          borderRadius: '6px',
+          margin: '20px 0 10px 0',
+          textAlign: 'center',
+          fontSize: '16px'
+        };
+
+        // Agrupar por móvil
+        if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+          const moviles = {};
+          elementosFiltrados.forEach(el => {
+            if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
+            moviles[el.ubicacion_id].push(el);
+          });
+
+          return Object.keys(moviles).sort().map(movil => (
+            <div key={movil}>
+              <h3 style={titleStyle}>Móvil {movil}</h3>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Nombre</th>
+                    <th style={thStyle}>Tipo</th>
+                    <th style={thStyle}>Estado</th>
+                    <th style={thStyle}>Baulera</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {moviles[movil].map(el => (
+                    <tr key={el.codigo_qr}>
+                      <td style={tdStyle}>{el.nombre}</td>
+                      <td style={tdStyle}>{el.tipo}</td>
+                      <td style={{
+                        ...tdStyle,
+                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                        fontWeight: 'bold'
+                      }}>
+                        {el.estado}
+                      </td>
+                      <td style={tdStyle}>{el.baulera_numero || '–'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ));
+        }
+
+        // Agrupar por depósito
+        if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
+          const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
+          elementosFiltrados.forEach(el => {
+            if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
+          });
+
+          return Object.keys(depositos).map(dep => (
+            <div key={dep}>
+              <h3 style={titleStyle}>{dep}</h3>
+              <table style={tableStyle}>
+                <thead>
+                  <tr>
+                    <th style={thStyle}>Nombre</th>
+                    <th style={thStyle}>Tipo</th>
+                    <th style={thStyle}>Estado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {depositos[dep].map(el => (
+                    <tr key={el.codigo_qr}>
+                      <td style={tdStyle}>{el.nombre}</td>
+                      <td style={tdStyle}>{el.tipo}</td>
+                      <td style={{
+                        ...tdStyle,
+                        color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                        fontWeight: 'bold'
+                      }}>
+                        {el.estado}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ));
+        }
+
+        // Vista plana
+        const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
+                       filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
+                       'Todos los elementos';
+
+        return (
+          <div>
+            <h3 style={titleStyle}>{titulo}</h3>
+            <table style={tableStyle}>
+              <thead>
+                <tr>
+                  <th style={thStyle}>Nombre</th>
+                  <th style={thStyle}>Tipo</th>
+                  <th style={thStyle}>Estado</th>
+                  <th style={thStyle}>Ubicación</th>
+                </tr>
+              </thead>
+              <tbody>
+                {elementosFiltrados.map(el => (
+                  <tr key={el.codigo_qr}>
+                    <td style={tdStyle}>{el.nombre}</td>
+                    <td style={tdStyle}>{el.tipo}</td>
+                    <td style={{
+                      ...tdStyle,
+                      color: el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red',
+                      fontWeight: 'bold'
+                    }}>
+                      {el.estado}
+                    </td>
+                    <td style={tdStyle}>
+                      {el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
+                        ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
+                        : el.deposito_nombre || '–'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      })()}
+    </div>
+  </div>
+)}
 
       </div>
     </>
