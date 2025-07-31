@@ -639,7 +639,7 @@ const fotosPorMovil = {
       }}
     >
       <option value="">Seleccionar Móvil</option>
-      <option value="1">Móvil 1</option>
+      <option value="18">Móvil 18</option>
       <option value="2">Móvil 2</option>
       <option value="3">Móvil 3</option>
       <option value="4">Móvil 4</option>
