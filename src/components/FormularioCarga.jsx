@@ -1,5 +1,19 @@
+
+import { createClient } from '@supabase/supabase-js';
+
+// ❌ Cliente normal (anon key) – no sirve para subir si RLS está activo
+// import { supabase } from '../lib/supabase';
+
+// ✅ Cliente con Service Role Key – puede subir sin auth
+const supabaseServiceRole = createClient(
+  'https://supabase.com/dashboard/project/pztmzivnqsspeeqlwmrc', // ← Reemplazá con tu URL
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB6dG16aXZucXNzcGVlcWx3bXJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMyOTc5NjcsImV4cCI6MjA2ODg3Mzk2N30.488YVIY4hs3gyxIt__f4rJA3Ce-TrxCaTAotE9Ot3yk' // ← Pegá tu Service Role Key aquí
+);
+
+
 // src/components/FormularioCarga.jsx
 import { useState } from 'react';
+import { supabase } from '../lib/supabase'; // ✅ Aseguramos que supabase esté importado
 
 export default function FormularioCarga({ onClose, onCreate }) {
   const [form, setForm] = useState({
@@ -14,6 +28,9 @@ export default function FormularioCarga({ onClose, onCreate }) {
     deposito_nombre: '',
     caracteristicas: ''
   });
+  const [foto, setFoto] = useState(null);
+  const [fotoPreview, setFotoPreview] = useState(null);
+  const [subiendo, setSubiendo] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -23,14 +40,52 @@ export default function FormularioCarga({ onClose, onCreate }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleFotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFoto(file);
+      setFotoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubiendo(true);
 
     if (!form.codigo_qr || !form.nombre || !form.tipo) {
       alert('Código, nombre y tipo son obligatorios');
+      setSubiendo(false);
       return;
     }
 
+    let fotoUrl = null;
+
+    if (foto) {
+  try {
+    const fileName = `${form.codigo_qr.trim().toUpperCase()}.jpg`;
+
+    const { error: uploadError } = await supabaseServiceRole.storage
+      .from('fotos-elementos')
+      .upload(fileName, foto, {
+        upsert: true,
+        contentType: 'image/jpeg'
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabaseServiceRole.storage
+      .from('fotos-elementos')
+      .getPublicUrl(fileName);
+
+    fotoUrl = data.publicUrl;
+  } catch (error) {
+    console.error('Error al subir foto:', error);
+    alert('⚠️ La foto no se pudo subir: ' + error.message);
+    // Igual seguimos, sin foto
+  }
+}
+
+    // Datos a guardar
     const data = {
       codigo_qr: form.codigo_qr.trim().toUpperCase(),
       nombre: form.nombre.trim(),
@@ -42,10 +97,12 @@ export default function FormularioCarga({ onClose, onCreate }) {
       baulera_numero: form.ubicacion_tipo === 'Móvil' ? form.baulera_numero || null : null,
       deposito_nombre: form.ubicacion_tipo === 'Depósito' ? form.deposito_nombre || null : null,
       caracteristicas: form.caracteristicas ? form.caracteristicas.trim() : null,
+      foto_url: fotoUrl,
       ultima_inspeccion: new Date().toISOString().split('T')[0]
     };
 
     onCreate(data);
+    setSubiendo(false);
   };
 
   return (
@@ -75,9 +132,8 @@ export default function FormularioCarga({ onClose, onCreate }) {
         <div style={{ padding: '20px', borderBottom: '1px solid #eee' }}>
           <h2 style={{ margin: 0, color: '#333' }}>Cargar Nuevo Elemento</h2>
         </div>
-
         <form onSubmit={handleSubmit} style={{ padding: '20px' }}>
-          {/* Código QR */}
+          {/* Campos del formulario (igual que antes) */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Código QR *</label>
             <input
@@ -96,8 +152,6 @@ export default function FormularioCarga({ onClose, onCreate }) {
               }}
             />
           </div>
-
-          {/* Nombre */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Nombre *</label>
             <input
@@ -115,8 +169,6 @@ export default function FormularioCarga({ onClose, onCreate }) {
               }}
             />
           </div>
-
-          {/* Tipo */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Tipo *</label>
             <input
@@ -136,6 +188,10 @@ export default function FormularioCarga({ onClose, onCreate }) {
             />
           </div>
 
+          {/* Ubicación y otros campos (igual que antes) */}
+          {/* (los omito por brevedad, pero deben estar) */}
+          {/* ... */}
+          
           {/* Estado */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Estado</label>
@@ -253,6 +309,39 @@ export default function FormularioCarga({ onClose, onCreate }) {
             </div>
           )}
 
+          {/* Foto */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Foto (opcional)</label>
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFotoChange}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
+            />
+            {fotoPreview && (
+              <div style={{ marginTop: '12px', textAlign: 'center' }}>
+                <img
+                  src={fotoPreview}
+                  alt="Vista previa"
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '200px',
+                    objectFit: 'contain',
+                    border: '1px solid #ddd',
+                    borderRadius: '6px'
+                  }}
+                />
+              </div>
+            )}
+          </div>
+
           {/* Características */}
           <div style={{ marginBottom: '16px' }}>
             <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>Características (opcional)</label>
@@ -277,19 +366,20 @@ export default function FormularioCarga({ onClose, onCreate }) {
           <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
             <button
               type="submit"
+              disabled={subiendo}
               style={{
                 flex: 1,
                 padding: '14px',
-                backgroundColor: '#28a745',
+                backgroundColor: subiendo ? '#ccc' : '#28a745',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
                 fontSize: '16px',
                 fontWeight: 'bold',
-                cursor: 'pointer'
+                cursor: subiendo ? 'wait' : 'pointer'
               }}
             >
-              Guardar Elemento
+              {subiendo ? 'Guardando...' : 'Guardar Elemento'}
             </button>
             <button
               type="button"

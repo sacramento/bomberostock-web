@@ -14,6 +14,33 @@ function App() {
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [movilSeleccionado, setMovilSeleccionado] = useState('');
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
+  const [mostrarMapa, setMostrarMapa] = useState(false);
+  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
+
+
+  // URLs de las 4 fotos por móvil (usa el formato: https://drive.google.com/uc?export=view&id=XXXX)
+const fotosPorMovil = {
+  '1': [
+    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M1',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M1',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M1',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M1'
+  ],
+  '2': [
+    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M2'
+  ],
+  '3': [
+    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M3'
+  ]
+  // Agregá más móviles si tenés
+};
+
 
   // Cargar elementos
   useEffect(() => {
@@ -499,7 +526,148 @@ function App() {
             >
               Ver Reporte de Materiales
             </button>
+
+{/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{mostrarMapa && movilSeleccionadoMapa && (
+  <div style={{
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 9999,
+    padding: '20px'
+  }}>
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      width: '100%',
+      maxWidth: '800px',
+      maxHeight: '90vh',
+      overflowY: 'auto',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+    }}>
+      <div style={{
+        padding: '20px',
+        borderBottom: '3px solid #b91c1c',
+        backgroundColor: '#b91c1c',
+        color: 'white',
+        borderTopLeftRadius: '12px',
+        borderTopRightRadius: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h2 style={{ margin: 0 }}>📸 Móvil {movilSeleccionadoMapa} - Distribución de Bauleras</h2>
+        <button
+          onClick={() => setMostrarMapa(false)}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          × Cerrar
+        </button>
+      </div>
+
+      <div style={{ padding: '20px' }}>
+        <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px' }}>
+          Seleccionaste el <strong>Móvil {movilSeleccionadoMapa}</strong>. A continuación, las vistas clave con la ubicación de cada baulera.
+        </p>
+
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '15px'
+        }}>
+          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
+            <div key={index} style={{ textAlign: 'center' }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 'bold' }}>
+                Vista {index + 1}
+              </p>
+              <img
+                src={url}
+                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
+                style={{
+                  width: '100%',
+                  maxHeight: '200px',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  border: '2px solid #ddd'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+disponible';
+                  e.target.style.objectFit = 'none';
+                  e.target.style.backgroundColor = '#f0f0f0';
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        <p style={{ marginTop: '30px', fontSize: '14px', color: '#666', textAlign: 'center' }}>
+          ✅ Usa esta referencia para ubicar los elementos en las bauleras correctas.
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
           </div>
+
+          {/* Botón: Mapa de Bauleras (público) */}
+<div className="card">
+  <h3>📍 Mapa de Bauleras</h3>
+  <div style={{ marginBottom: '12px' }}>
+    <select
+      value={movilSeleccionadoMapa}
+      onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '10px',
+        border: '1px solid #ccc',
+        borderRadius: '6px',
+        fontSize: '16px'
+      }}
+    >
+      <option value="">Seleccionar Móvil</option>
+      <option value="1">Móvil 1</option>
+      <option value="2">Móvil 2</option>
+      <option value="3">Móvil 3</option>
+      <option value="4">Móvil 4</option>
+      <option value="5">Móvil 5</option>
+    </select>
+  </div>
+  <button
+    onClick={() => {
+      if (!movilSeleccionadoMapa) {
+        alert('Seleccioná un móvil');
+        return;
+      }
+      setMostrarMapa(true);
+    }}
+    style={{
+      width: '100%',
+      padding: '14px',
+      backgroundColor: '#6f42c1',
+      color: 'white',
+      border: 'none',
+      borderRadius: '6px',
+      fontSize: '16px',
+      fontWeight: 'bold'
+    }}
+  >
+    Ver Fotos del Móvil {movilSeleccionadoMapa}
+  </button>
+</div>
 
           {/* Ficha del elemento */}
           {element && (
