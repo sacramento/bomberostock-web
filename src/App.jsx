@@ -20,11 +20,11 @@ function App() {
 
   // URLs de las 4 fotos por móvil (usa el formato: https://drive.google.com/uc?export=view&id=XXXX)
 const fotosPorMovil = {
-  '1': [
-    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M1',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M1',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M1',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M1'
+  '18': [
+    'https://drive.google.com/uc?export=view&id=1YHhnUNsB36Bsoj3xY9LXA0bsChOTUarm',
+    'https://drive.google.com/uc?export=view&id=1i64X32SjB6aTGg4z2QB7g8n1mk_4_tr0',
+    'https://drive.google.com/uc?export=view&id=1Zmjs8MHK4BaxqdRd7cuoYWd3P8mauZI-',
+   
   ],
   '2': [
     'https://drive.google.com/uc?export=view&id=ID_FOTO1_M2',
