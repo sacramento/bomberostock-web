@@ -410,13 +410,21 @@ function App() {
                 );
 
                 window.html5QrcodeScanner.render(
-                  (decodedText) => {
-                    closeScanner();
-                    setSearchCode(decodedText);
-                    handleSearch();
-                  },
-                  () => {}
-                );
+                (decodedText) => {
+                  closeScanner();
+                  setSearchCode(decodedText); // Solo para mostrar en el input
+                  // Búsqueda directa sin depender del estado
+                  const found = elementos[decodedText.trim().toUpperCase()];
+                  if (found) {
+                    setElement(found);
+                  } else {
+                    alert('Elemento no encontrado');
+                  }
+                },
+                (errorMessage) => {
+                  console.warn("Error:", errorMessage);
+                }
+              );
               };
               script.onerror = () => alert('Error al cargar el escáner');
               document.head.appendChild(script);
