@@ -23,7 +23,7 @@ const fotosPorMovil = {
   '18': [
     'https://i.ibb.co/99BrdTFw/18-acompan-ante.jpg',
     'https://i.ibb.co/mVbMqFNX/18-conductor.jpg',
-    'hhttps://i.ibb.co/qFrhMLpm/18-trasera.jpg',
+    'https://i.ibb.co/qFrhMLpm/18-trasera.jpg',
    
   ],
   '2': [
