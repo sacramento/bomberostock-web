@@ -318,7 +318,7 @@ const fotosPorMovil = {
             justifyContent: 'space-between',
             alignItems: 'center'
           }}>
-            <h1 style={{ margin: 0 }}>BomberoStock</h1>
+            <h1 style={{ margin: 0 }}>Materiales BV SMA</h1>
             <div style={{ fontSize: '14px' }}>
               Acceso público: búsqueda y reporte
             </div>
@@ -1086,7 +1086,7 @@ const fotosPorMovil = {
       <div className="container">
         {/* Header */}
         <div className="header">
-          <h1>BomberoStock</h1>
+          <h1>Materiales BV SMA</h1>
           <p>Legajo: {user.legajo} • Rol: {user.role}</p>
         </div>
 
