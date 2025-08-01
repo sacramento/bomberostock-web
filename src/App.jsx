@@ -529,19 +529,22 @@ const fotosPorMovil = {
 
 {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
 {mostrarMapa && movilSeleccionadoMapa && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    padding: '20px'
-  }}>
+  <div
+    key={movilSeleccionadoMapa}
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      padding: '20px'
+    }}
+  >
     <div style={{
       backgroundColor: 'white',
       borderRadius: '12px',
@@ -562,7 +565,7 @@ const fotosPorMovil = {
         justifyContent: 'space-between',
         alignItems: 'center'
       }}>
-        <h2 style={{ margin: 0 }}>📸 Móvil {movilSeleccionadoMapa} - Distribución de Bauleras</h2>
+        <h2 style={{ margin: 0 }}>📸 Móvil {movilSeleccionadoMapa}</h2>
         <button
           onClick={() => setMostrarMapa(false)}
           style={{
@@ -579,9 +582,7 @@ const fotosPorMovil = {
       </div>
 
       <div style={{ padding: '20px' }}>
-        <p style={{ fontSize: '16px', color: '#555', marginBottom: '20px' }}>
-          Seleccionaste el <strong>Móvil {movilSeleccionadoMapa}</strong>. A continuación, las vistas clave con la ubicación de cada baulera.
-        </p>
+        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
 
         <div style={{
           display: 'grid',
@@ -590,9 +591,6 @@ const fotosPorMovil = {
         }}>
           {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
             <div key={index} style={{ textAlign: 'center' }}>
-              <p style={{ margin: '0 0 8px 0', fontSize: '14px', fontWeight: 'bold' }}>
-                Vista {index + 1}
-              </p>
               <img
                 src={url}
                 alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
@@ -604,18 +602,16 @@ const fotosPorMovil = {
                   border: '2px solid #ddd'
                 }}
                 onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+disponible';
-                  e.target.style.objectFit = 'none';
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
                   e.target.style.backgroundColor = '#f0f0f0';
                 }}
               />
+              <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>
+                Vista {index + 1}
+              </p>
             </div>
           ))}
         </div>
-
-        <p style={{ marginTop: '30px', fontSize: '14px', color: '#666', textAlign: 'center' }}>
-          ✅ Usa esta referencia para ubicar los elementos en las bauleras correctas.
-        </p>
       </div>
     </div>
   </div>
