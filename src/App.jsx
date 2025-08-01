@@ -21,9 +21,9 @@ function App() {
   // URLs de las 4 fotos por móvil (usa el formato: https://drive.google.com/uc?export=view&id=XXXX)
 const fotosPorMovil = {
   '18': [
-    'https://drive.google.com/uc?export=view&id=1YHhnUNsB36Bsoj3xY9LXA0bsChOTUarm',
-    'https://drive.google.com/uc?export=view&id=1i64X32SjB6aTGg4z2QB7g8n1mk_4_tr0',
-    'https://drive.google.com/uc?export=view&id=1Zmjs8MHK4BaxqdRd7cuoYWd3P8mauZI-',
+    'https://i.ibb.co/99BrdTFw/18-acompan-ante.jpg',
+    'https://i.ibb.co/mVbMqFNX/18-conductor.jpg',
+    'hhttps://i.ibb.co/qFrhMLpm/18-trasera.jpg',
    
   ],
   '2': [
