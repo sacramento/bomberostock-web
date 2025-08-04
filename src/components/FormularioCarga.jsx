@@ -370,7 +370,7 @@ export default function FormularioCarga({ onClose, onCreate }) {
               style={{
                 flex: 1,
                 padding: '14px',
-                backgroundColor: subiendo ? '#ccc' : '#28a745',
+                backgroundColor: subiendo ? '#ccc' : '#ca8a04',
                 color: 'white',
                 border: 'none',
                 borderRadius: '6px',
