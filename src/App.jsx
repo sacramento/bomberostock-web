@@ -223,6 +223,171 @@ function App() {
     ventana.document.close();
   };
 
+  {/* PANEL: REPORTE CON FILTROS */}
+{mostrarReporte && (
+  <div
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      padding: '20px'
+    }}
+  >
+    <div
+      style={{
+        backgroundColor: 'white',
+        borderRadius: '12px',
+        width: '100%',
+        maxWidth: '800px',
+        maxHeight: '90vh',
+        overflowY: 'auto',
+        boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: '20px',
+          borderBottom: '3px solid #b91c1c',
+          backgroundColor: '#b91c1c',
+          color: 'white',
+          borderTopLeftRadius: '12px',
+          borderTopRightRadius: '12px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
+        <button
+          onClick={() => setMostrarReporte(false)}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          × Cerrar
+        </button>
+      </div>
+
+      {/* Contenido */}
+      <div style={{ padding: '20px' }}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+            Ver:
+          </label>
+          <select
+            value={filtroUbicacion}
+            onChange={(e) => {
+              setFiltroUbicacion(e.target.value);
+              setMovilSeleccionado('');
+              setDepositoSeleccionado('');
+            }}
+            style={{
+              width: '100%',
+              padding: '10px',
+              border: '1px solid #ccc',
+              borderRadius: '6px',
+              fontSize: '16px'
+            }}
+          >
+            <option value="">Seleccionar...</option>
+            <option value="todos">Todos los elementos</option>
+            <option value="movil">Por Móvil</option>
+            <option value="deposito">Por Depósito</option>
+          </select>
+        </div>
+
+        {/* Si elige "Por Móvil" */}
+        {filtroUbicacion === 'movil' && (
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+              Seleccionar Móvil
+            </label>
+            <select
+              value={movilSeleccionado}
+              onChange={(e) => setMovilSeleccionado(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
+            >
+              <option value="">Todos los móviles</option>
+              {(() => {
+                const moviles = new Set();
+                Object.values(elementos).forEach(el => {
+                  if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                    moviles.add(el.ubicacion_id);
+                  }
+                });
+                return Array.from(moviles).sort().map(movil => (
+                  <option key={movil} value={movil}>Móvil {movil}</option>
+                ));
+              })()}
+            </select>
+          </div>
+        )}
+
+        {/* Si elige "Por Depósito" */}
+        {filtroUbicacion === 'deposito' && (
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
+              Seleccionar Depósito
+            </label>
+            <select
+              value={depositoSeleccionado}
+              onChange={(e) => setDepositoSeleccionado(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '10px',
+                border: '1px solid #ccc',
+                borderRadius: '6px',
+                fontSize: '16px'
+              }}
+            >
+              <option value="">Todos los depósitos</option>
+              <option value="Depósito 1">Depósito 1</option>
+              <option value="Depósito 2">Depósito 2</option>
+            </select>
+          </div>
+        )}
+
+        {/* Botón para generar */}
+        <button
+          onClick={abrirReporteEnPestaña}
+          style={{
+            width: '100%',
+            padding: '14px',
+            backgroundColor: '#28a745',
+            color: 'white',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer'
+          }}
+        >
+          🖨️ Imprimir Reporte
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
   if (!user) {
     return (
       <div className="container">
@@ -307,7 +472,7 @@ function App() {
 
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
-          <button onClick={abrirReporteEnPestaña} className="btn btn-info">Ver Reporte</button>
+          <button onClick={() => setMostrarReporte(true)} className="btn btn-info">Ver Reporte</button>
         </div>
 
         {element && (
@@ -338,6 +503,9 @@ function App() {
   }
 
   return <div>Modo privado cargado</div>;
+
+
+  
 }
 
 export default App;
