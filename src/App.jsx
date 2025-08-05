@@ -564,17 +564,18 @@ function App() {
         />
       )}
 
-      {(user.role === 'admin' || user.role === 'operador') && !mostrarReporte && !mostrarFormulario && !element && (
-        <div className="card">
-          <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
-          <button
-            onClick={() => setViendoUsuarios(!viendoUsuarios)}
-            className="btn btn-warning"
-          >
-            👥 Gestionar Usuarios
-          </button>
-        </div>
-      )}
+      {/* Gestionar Usuarios (solo Admin) */}
+{user.role === 'admin' && !mostrarReporte && !mostrarFormulario && !element && (
+  <div className="card">
+    <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
+    <button
+      onClick={() => setViendoUsuarios(!viendoUsuarios)}
+      className="btn btn-warning"
+    >
+      👥 Gestionar Usuarios
+    </button>
+  </div>
+)}
 
       {/* Panel: Gestionar Usuarios */}
 {viendoUsuarios && (
@@ -754,16 +755,18 @@ function App() {
         </div>
       )}
 
+      {/* Botón: Reporte de Materiales */}
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
-        <div className="card">
-          <h3>📋 Reporte de Materiales</h3>
-          <button
-            onClick={() => setMostrarReporte(true)} className="btn btn-info"
-          >
-            Ver Reporte de Materiales
-          </button>
-        </div>
-      )}
+      <div className="card">
+        <h3>📋 Reporte de Materiales</h3>
+        <button
+          onClick={() => setMostrarReporte(true)}
+          className="btn btn-info"
+        >
+          Ver Reporte de Materiales
+        </button>
+      </div>
+)}
     </div>
   );
 }
