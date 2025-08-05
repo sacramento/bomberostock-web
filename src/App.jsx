@@ -277,7 +277,6 @@ function App() {
     ventana.document.close();
   };
 
-  // --- VISTA PÚBLICA ---
   if (!user) {
     return (
       <div className="container">
@@ -310,38 +309,41 @@ function App() {
         </div>
 
         {/* Escanear QR */}
-        <button onClick={async () => {
-          const script = document.createElement('script');
-          script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
-          script.onload = () => {
-            const overlay = document.createElement('div');
-            overlay.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;';
-            const container = document.createElement('div');
-            container.id = 'qr-reader';
-            container.style = 'width:90vw;height:70vh;max-width:600px;max-height:500px;border-radius:12px;overflow:hidden;';
-            const cancelBtn = document.createElement('button');
-            cancelBtn.textContent = '❌ Cerrar';
-            cancelBtn.style = 'padding:14px 24px;background:#dc3545;color:white;border:none;border-radius:8px;margin-top:16px;cursor:pointer;';
-            overlay.appendChild(container);
-            overlay.appendChild(cancelBtn);
-            document.body.appendChild(overlay);
-            const close = () => { try { window.html5QrcodeScanner.clear(); } catch (e) {} document.body.removeChild(overlay); };
-            cancelBtn.onclick = close;
-            window.html5QrcodeScanner = new Html5QrcodeScanner('qr-reader', { fps: 10, qrbox: 300, facingMode: 'environment' }, false);
-            window.html5QrcodeScanner.render((decodedText) => {
-              close();
-              setSearchCode(decodedText);
-              const found = elementos[decodedText.trim().toUpperCase()];
-              if (found) {
-                setElement(found);
-              } else {
-                alert('Elemento no encontrado');
-              }
-            }, () => {});
-          };
-          script.onerror = () => alert('Error al cargar el escáner');
-          document.head.appendChild(script);
-        }} className="btn btn-primary">
+        <button
+          onClick={async () => {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+            script.onload = () => {
+              const overlay = document.createElement('div');
+              overlay.style = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;';
+              const container = document.createElement('div');
+              container.id = 'qr-reader';
+              container.style = 'width:90vw;height:70vh;max-width:600px;max-height:500px;border-radius:12px;overflow:hidden;';
+              const cancelBtn = document.createElement('button');
+              cancelBtn.textContent = '❌ Cerrar';
+              cancelBtn.style = 'padding:14px 24px;background:#dc3545;color:white;border:none;border-radius:8px;margin-top:16px;cursor:pointer;';
+              overlay.appendChild(container);
+              overlay.appendChild(cancelBtn);
+              document.body.appendChild(overlay);
+              const close = () => { try { window.html5QrcodeScanner.clear(); } catch (e) {} document.body.removeChild(overlay); };
+              cancelBtn.onclick = close;
+              window.html5QrcodeScanner = new Html5QrcodeScanner('qr-reader', { fps: 10, qrbox: 300, facingMode: 'environment' }, false);
+              window.html5QrcodeScanner.render((decodedText) => {
+                close();
+                setSearchCode(decodedText);
+                const found = elementos[decodedText.trim().toUpperCase()];
+                if (found) {
+                  setElement(found);
+                } else {
+                  alert('Elemento no encontrado');
+                }
+              }, () => {});
+            };
+            script.onerror = () => alert('Error al cargar el escáner');
+            document.head.appendChild(script);
+          }}
+          className="btn btn-primary"
+        >
           📷 Escanear QR
         </button>
 
