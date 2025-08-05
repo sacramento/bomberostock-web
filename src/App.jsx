@@ -564,7 +564,7 @@ function App() {
         />
       )}
 
-      {user.role === 'admin' && !mostrarReporte && !mostrarFormulario && !element && (
+      {(user.role === 'admin' || user.role === 'operador') && !mostrarReporte && !mostrarFormulario && !element && (
         <div className="card">
           <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
           <button
@@ -576,11 +576,159 @@ function App() {
         </div>
       )}
 
-      {viendoUsuarios && (
-        <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
-          {/* Contenido del panel de usuarios */}
-        </div>
+      {/* Panel: Gestionar Usuarios */}
+{viendoUsuarios && (
+  <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+      <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
+      <button
+        onClick={() => setViendoUsuarios(false)}
+        style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+      >
+        × Cerrar
+      </button>
+    </div>
+
+    {/* Solo el admin puede agregar */}
+    {user.role === 'admin' && (
+      <button
+        onClick={() => {
+          const legajo = prompt('Legajo (3 dígitos)');
+          if (!legajo || !/^\d{3}$/.test(legajo)) {
+            alert('Legajo debe ser de 3 dígitos');
+            return;
+          }
+          const nombre = prompt('Nombre');
+          if (!nombre) return;
+          const apellido = prompt('Apellido');
+          if (!apellido) return;
+          const password = prompt('Contraseña');
+          if (!password) return;
+          const rango = prompt('Rango (opcional)', '');
+          const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
+          const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
+          const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
+          const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
+          const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
+          const guardar = async () => {
+            const { error } = await supabase.from('usuarios').insert([nuevo]);
+            if (error) {
+              alert('Error: ' + error.message);
+            } else {
+              alert('✅ Usuario agregado');
+              const { data } = await supabase.from('usuarios').select('*');
+              setUsuarios(data);
+            }
+          };
+          guardar();
+        }}
+        style={{
+          backgroundColor: '#28a745',
+          color: 'white',
+          border: 'none',
+          padding: '10px 16px',
+          borderRadius: '6px',
+          fontSize: '14px',
+          fontWeight: 'bold',
+          marginBottom: '16px'
+        }}
+      >
+        + Agregar Usuario
+      </button>
+    )}
+
+    <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px' }}>
+      {usuarios.length === 0 ? (
+        <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
+      ) : (
+        usuarios.map(u => (
+          <div key={u.id} style={{ padding: '12px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <strong>{u.nombre} {u.apellido}</strong> ({u.legajo})
+              </div>
+              <div>
+                {/* Solo el admin puede editar y eliminar */}
+                {user.role === 'admin' && (
+                  <>
+                    <button
+                      onClick={() => {
+                        const nuevoNombre = prompt('Nombre', u.nombre);
+                        const nuevoApellido = prompt('Apellido', u.apellido);
+                        const nuevoRango = prompt('Rango', u.rango || '');
+                        const nuevoCuartel = prompt('Cuartel', u.cuartel);
+                        const nuevoRole = prompt('Rol', u.role);
+                        const editar = async () => {
+                          const { error } = await supabase
+                            .from('usuarios')
+                            .update({
+                              nombre: nuevoNombre,
+                              apellido: nuevoApellido,
+                              rango: nuevoRango || null,
+                              cuartel: nuevoCuartel,
+                              role: ['lectura', 'operador', 'admin'].includes(nuevoRole) ? nuevoRole : u.role
+                            })
+                            .eq('id', u.id);
+                          if (error) {
+                            alert('Error: ' + error.message);
+                          } else {
+                            const { data } = await supabase.from('usuarios').select('*');
+                            setUsuarios(data);
+                          }
+                        };
+                        editar();
+                      }}
+                      style={{
+                        padding: '6px 10px',
+                        backgroundColor: '#ffc107',
+                        color: 'black',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        marginRight: '8px'
+                      }}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={() => {
+                        if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
+                          const borrar = async () => {
+                            const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+                            if (error) {
+                              alert('Error: ' + error.message);
+                            } else {
+                              const { data } = await supabase.from('usuarios').select('*');
+                              setUsuarios(data);
+                            }
+                          };
+                          borrar();
+                        }
+                      }}
+                      style={{
+                        padding: '6px 10px',
+                        backgroundColor: '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+            <div style={{ fontSize: '14px', color: '#555' }}>
+              <span>Rango: {u.rango || '–'}</span> • <span>Cuartel: {u.cuartel || '–'}</span> • <span>Rol: {u.role}</span>
+            </div>
+          </div>
+        ))
       )}
+    </div>
+  </div>
+)}
 
       {element && (
         <div className="card ficha">
@@ -610,8 +758,7 @@ function App() {
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
           <button
-            onClick={() => setMostrarReporte(true)}
-            className="btn btn-info"
+            onClick={() => setMostrarReporte(true)} className="btn btn-info"
           >
             Ver Reporte de Materiales
           </button>
