@@ -1,36 +1,17 @@
-/* src/styles.css - Estilo profesional para BomberoStock */
-
-/* Reset básico */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #1f2937; /* Fondo gris oscuro (como uniforme) */
-  color: #e5e7eb; /* Texto gris claro */
-  line-height: 1.6;
-}
-
+/* src/styles.css - Estilos para BomberoStock */
 .container {
   max-width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
-/* Header superior - Rojo bomberil */
 .header {
-  background-color: #b91c1c; /* Rojo fuego */
+  background-color: #b91c1c;
   color: white;
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .header h1 {
@@ -44,30 +25,26 @@ body {
   opacity: 0.9;
 }
 
-/* Tarjetas - Fondo oscuro con borde sutil */
 .card {
-  background: #374151; /* Gris carbón */
+  background: white;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
   margin-bottom: 24px;
-  border: 1px solid #4b5563; /* Bordes más claros */
 }
 
-/* Formulario de login */
 .card.login {
-  background-color: #1f2937; /* Fondo más oscuro */
-  border: 1px solid #4b5563;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
   padding: 16px;
 }
 
 .card.login h3 {
   margin: 0 0 12px 0;
-  color: #f3f4f6;
+  color: #333;
   font-size: 18px;
 }
 
-/* Botones */
 .btn {
   display: block;
   width: 100%;
@@ -79,123 +56,73 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-/* Colores de botones */
 .btn-primary {
-  background-color: #b91c1c; /* Rojo bomberil */
+  background-color: #007bff;
   color: white;
 }
 
 .btn-secondary {
-  background-color: #6b7280; /* Gris profesional */
+  background-color: #28a745;
   color: white;
 }
 
 .btn-info {
-  background-color: #111827; /* Negro azulado */
+  background-color: #17a2b8;
   color: white;
-  border: 1px solid #4b5563;
 }
 
 .btn-warning {
-  background-color: #ca8a04; /* Amarillo de seguridad */
+  background-color: #6f42c1;
   color: white;
 }
 
 .btn-danger {
-  background-color: #dc2626; /* Rojo más intenso */
+  background-color: #dc3545;
   color: white;
 }
 
-/* Inputs */
 .input {
   width: 100%;
   padding: 12px;
   margin: 8px 0;
   font-size: 16px;
-  border: 1px solid #4b5563;
+  border: 1px solid #ccc;
   border-radius: 6px;
-  background-color: #1f2937;
-  color: #e5e7eb;
-  transition: border-color 0.2s;
+  box-sizing: border-box;
 }
 
-.input:focus {
-  outline: none;
-  border-color: #b91c1c;
-  box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
-}
-
-/* Ficha del elemento */
 .ficha {
-  background-color: #374151;
+  background-color: #f9f9f9;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-  border: 1px solid #4b5563;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
 .ficha h2 {
   margin-top: 0;
-  color: #f3f4f6;
 }
 
 .ficha img {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
-  border: 1px solid #4b5563;
+  border: 1px solid #ddd;
   margin-bottom: 16px;
-  border-radius: 6px;
 }
 
 .ficha p {
   margin: 8px 0;
   line-height: 1.8;
-  color: #e5e7eb;
 }
 
 .ficha strong {
-  color: #fbbf24; /* Amarillo suave para énfasis */
+  color: #1f2937;
 }
 
-/* Tabla de reporte */
-.tabla-reporte th {
-  background: #b91c1c;
-  color: white;
-  padding: 12px;
-  text-align: left;
-  font-weight: bold;
-}
-
-.tabla-reporte td {
-  padding: 10px;
-  border: 1px solid #4b5563;
-  color: #e5e7eb;
-  background-color: #374151;
-}
-
-/* Responsive */
 @media (max-width: 600px) {
-  .container {
-    padding: 16px;
-  }
-  .btn {
-    padding: 16px;
-    font-size: 17px;
-  }
-  .input {
-    font-size: 16px;
-  }
+  .container { padding: 16px; }
+  .btn { padding: 16px; font-size: 17px; }
+  .input { font-size: 16px; }
 }

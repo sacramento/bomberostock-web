@@ -15,34 +15,24 @@ function App() {
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [movilSeleccionado, setMovilSeleccionado] = useState('');
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
-  const [mostrarMapa, setMostrarMapa] = useState(false);
-  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
 
-  const fotosPorMovil = {
-    '18': [
-      'https://i.ibb.co/C3gdmtJ2/18-acompan-ante.jpg',
-      'https://i.ibb.co/KpRJBPgZ/18-conductor.jpg',
-      'https://i.ibb.co/rS0K8mt/18-trasera.jpg',
-    ],
-    '2': [
-      'https://drive.google.com/uc?export=view&id=ID_FOTO1_M2',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO2_M2',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO3_M2',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO4_M2'
-    ],
-    '3': [
-      'https://drive.google.com/uc?export=view&id=ID_FOTO1_M3',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO2_M3',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO3_M3',
-      'https://drive.google.com/uc?export=view&id=ID_FOTO4_M3'
-    ]
+  const [legajo, setLegajo] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const usuario = usuarios.find(u => u.legajo === legajo && u.password === password);
+    if (usuario && ['operador', 'admin'].includes(usuario.role)) {
+      setUser({ legajo: usuario.legajo, role: usuario.role });
+    } else {
+      alert('Acceso denegado. Solo operadores y admins.');
+    }
   };
 
   useEffect(() => {
     const cargarElementos = async () => {
       const { data, error } = await supabase.from('elementos').select('*');
       if (error) {
-        console.error('Error al cargar elementos:', error);
         alert('Error: ' + error.message);
       } else {
         const map = {};
@@ -67,41 +57,6 @@ function App() {
     cargarUsuarios();
   }, []);
 
-  const crearElemento = async (nuevoElemento) => {
-    const { error } = await supabase.from('elementos').insert([nuevoElemento]);
-    if (error) {
-      console.error('Error al crear:', error);
-      alert('❌ Error: ' + error.message);
-    } else {
-      alert('✅ Elemento creado con éxito');
-      const { data } = await supabase.from('elementos').select('*');
-      const map = {};
-      data.forEach(el => {
-        map[el.codigo_qr] = el;
-      });
-      setElementos(map);
-    }
-  };
-
-  const actualizarElemento = async (codigo, cambios) => {
-    const { error } = await supabase
-      .from('elementos')
-      .update(cambios)
-      .eq('codigo_qr', codigo);
-    if (error) {
-      console.error('Error al actualizar:', error);
-      alert('❌ Error: ' + error.message);
-    } else {
-      alert('✅ Actualizado');
-      const { data } = await supabase.from('elementos').select('*');
-      const map = {};
-      data.forEach(el => {
-        map[el.codigo_qr] = el;
-      });
-      setElementos(map);
-    }
-  };
-
   const handleSearch = () => {
     const code = searchCode.trim().toUpperCase();
     const found = elementos[code];
@@ -109,19 +64,6 @@ function App() {
       setElement(found);
     } else {
       alert('Elemento no encontrado');
-    }
-  };
-
-  const [legajo, setLegajo] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const usuario = usuarios.find(u => u.legajo === legajo && u.password === password);
-    if (usuario && ['operador', 'admin'].includes(usuario.role)) {
-      setUser({ legajo: usuario.legajo, role: usuario.role });
-    } else {
-      alert('Acceso denegado. Solo operadores y admins.');
     }
   };
 
@@ -143,6 +85,10 @@ function App() {
       );
     } else if (filtroUbicacion === 'deposito') {
       elementosFiltrados = elementosArray.filter(el => el.deposito_nombre);
+    }
+
+    if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+      elementosFiltrados = Object.values(elementos);
     }
 
     let contenido = `
@@ -280,13 +226,11 @@ function App() {
   if (!user) {
     return (
       <div className="container">
-        {/* Header */}
         <div className="header">
           <h1>Materiales BV SMA</h1>
           <div>Acceso público: búsqueda y reporte</div>
         </div>
 
-        {/* Login */}
         <div className="card login">
           <h3>🔐 Acceso para Operador/Admin</h3>
           <form onSubmit={handleLogin} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -308,7 +252,6 @@ function App() {
           </form>
         </div>
 
-        {/* Escanear QR */}
         <button
           onClick={async () => {
             const script = document.createElement('script');
@@ -347,7 +290,6 @@ function App() {
           📷 Escanear QR
         </button>
 
-        {/* Búsqueda */}
         <div className="card">
           <h2>🔍 Buscar por código</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -363,41 +305,11 @@ function App() {
           </div>
         </div>
 
-        {/* Reporte */}
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
-          <button onClick={() => setMostrarReporte(true)} className="btn btn-info">Ver Reporte</button>
+          <button onClick={abrirReporteEnPestaña} className="btn btn-info">Ver Reporte</button>
         </div>
 
-        {/* Mapa de Bauleras */}
-        <div className="card">
-          <h3>📍 Mapa de Bauleras</h3>
-          <select
-            value={movilSeleccionadoMapa}
-            onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
-            className="input"
-          >
-            <option value="">Seleccionar Móvil</option>
-            <option value="18">Móvil 18</option>
-            <option value="2">Móvil 2</option>
-            <option value="3">Móvil 3</option>
-          </select>
-          <button
-            onClick={() => {
-              if (!movilSeleccionadoMapa) {
-                alert('Seleccioná un móvil');
-                return;
-              }
-              setMostrarMapa(true);
-            }}
-            className="btn btn-warning"
-            style={{ marginTop: '8px' }}
-          >
-            Ver Fotos del Móvil {movilSeleccionadoMapa}
-          </button>
-        </div>
-
-        {/* Ficha del elemento */}
         {element && (
           <div className="card ficha">
             <button
@@ -419,55 +331,6 @@ function App() {
                 : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
             </p>
             <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
-          </div>
-        )}
-
-        {/* PANEL: MAPA DE BAULERAS */}
-        {mostrarMapa && movilSeleccionadoMapa && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center',
-            alignItems: 'center', zIndex: 9999
-          }}>
-            <div style={{
-              backgroundColor: 'white', borderRadius: '12px', width: '90%', maxWidth: '800px',
-              maxHeight: '90vh', overflowY: 'auto', padding: '20px'
-            }}>
-              <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-                {fotosPorMovil[movilSeleccionadoMapa]?.map((url, i) => (
-                  <div key={i} style={{ textAlign: 'center' }}>
-                    <img src={url} alt="" style={{ width: '100%', maxHeight: '200px', objectFit: 'cover', borderRadius: '8px' }} />
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => setMostrarMapa(false)}
-                style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer' }}
-              >
-                × Cerrar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* PANEL: REPORTE */}
-        {mostrarReporte && (
-          <div style={{
-            position: 'fixed', top: 0, left: 0, width: '100%', height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', justifyContent: 'center',
-            alignItems: 'center', zIndex: 9999
-          }}>
-            <div style={{
-              backgroundColor: 'white', borderRadius: '12px', width: '90%', maxWidth: '900px',
-              maxHeight: '90vh', overflowY: 'auto', padding: '20px'
-            }}>
-              <h2>📋 Reporte de Materiales</h2>
-              <p>Funcionalidad de reporte activada</p>
-              <button onClick={() => setMostrarReporte(false)} style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px' }}>
-                × Cerrar
-              </button>
-            </div>
           </div>
         )}
       </div>
