@@ -1,5 +1,6 @@
 /* src/styles.css - Estilo profesional para BomberoStock */
 
+/* Reset básico */
 * {
   margin: 0;
   padding: 0;
@@ -8,8 +9,9 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background-color: #f8f9fa;
-  color: #333;
+  background-color: #1f2937; /* Fondo gris oscuro (como uniforme) */
+  color: #e5e7eb; /* Texto gris claro */
+  line-height: 1.6;
 }
 
 .container {
@@ -18,9 +20,9 @@ body {
   padding: 20px;
 }
 
-/* Header */
+/* Header superior - Rojo bomberil */
 .header {
-  background-color: #b91c1c;
+  background-color: #b91c1c; /* Rojo fuego */
   color: white;
   padding: 16px;
   border-radius: 8px;
@@ -28,6 +30,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .header h1 {
@@ -41,24 +44,26 @@ body {
   opacity: 0.9;
 }
 
-/* Tarjetas */
+/* Tarjetas - Fondo oscuro con borde sutil */
 .card {
-  background: white;
+  background: #374151; /* Gris carbón */
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   margin-bottom: 24px;
+  border: 1px solid #4b5563; /* Bordes más claros */
 }
 
+/* Formulario de login */
 .card.login {
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
+  background-color: #1f2937; /* Fondo más oscuro */
+  border: 1px solid #4b5563;
   padding: 16px;
 }
 
 .card.login h3 {
   margin: 0 0 12px 0;
-  color: #333;
+  color: #f3f4f6;
   font-size: 18px;
 }
 
@@ -74,39 +79,42 @@ body {
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.2s ease;
 }
 
 .btn:hover {
   transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .btn:active {
   transform: translateY(0);
 }
 
+/* Colores de botones */
 .btn-primary {
-  background-color: #b91c1c;
+  background-color: #b91c1c; /* Rojo bomberil */
   color: white;
 }
 
 .btn-secondary {
-  background-color: #28a745;
+  background-color: #6b7280; /* Gris profesional */
   color: white;
 }
 
 .btn-info {
-  background-color: #17a2b8;
+  background-color: #111827; /* Negro azulado */
   color: white;
+  border: 1px solid #4b5563;
 }
 
 .btn-warning {
-  background-color: #6f42c1;
+  background-color: #ca8a04; /* Amarillo de seguridad */
   color: white;
 }
 
 .btn-danger {
-  background-color: #dc3545;
+  background-color: #dc2626; /* Rojo más intenso */
   color: white;
 }
 
@@ -116,37 +124,66 @@ body {
   padding: 12px;
   margin: 8px 0;
   font-size: 16px;
-  border: 1px solid #ccc;
+  border: 1px solid #4b5563;
   border-radius: 6px;
+  background-color: #1f2937;
+  color: #e5e7eb;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #b91c1c;
+  box-shadow: 0 0 0 2px rgba(185, 28, 28, 0.2);
 }
 
 /* Ficha del elemento */
 .ficha {
-  background-color: #f9f9f9;
+  background-color: #374151;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  border: 1px solid #4b5563;
 }
 
 .ficha h2 {
   margin-top: 0;
+  color: #f3f4f6;
 }
 
 .ficha img {
   max-width: 100%;
   max-height: 200px;
   object-fit: contain;
-  border: 1px solid #ddd;
+  border: 1px solid #4b5563;
   margin-bottom: 16px;
+  border-radius: 6px;
 }
 
 .ficha p {
   margin: 8px 0;
   line-height: 1.8;
+  color: #e5e7eb;
 }
 
 .ficha strong {
-  color: #1f2937;
+  color: #fbbf24; /* Amarillo suave para énfasis */
+}
+
+/* Tabla de reporte */
+.tabla-reporte th {
+  background: #b91c1c;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+.tabla-reporte td {
+  padding: 10px;
+  border: 1px solid #4b5563;
+  color: #e5e7eb;
+  background-color: #374151;
 }
 
 /* Responsive */
