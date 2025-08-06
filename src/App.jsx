@@ -17,8 +17,33 @@ function App() {
   const [movilSeleccionado, setMovilSeleccionado] = useState('');
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
 
+  const [mostrarMapa, setMostrarMapa] = useState(false);
+  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
+
   const [legajo, setLegajo] = useState('');
   const [password, setPassword] = useState('');
+
+const fotosPorMovil = {
+  '18': [
+    'https://i.ibb.co/C3gdmtJ2/18-acompan-ante.jpg',
+    'https://i.ibb.co/KpRJBPgZ/18-conductor.jpg',
+    'https://i.ibb.co/rS0K8mt/18-trasera.jpg',
+  ],
+  '2': [
+    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M2',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M2'
+  ],
+  '3': [
+    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M3',
+    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M3'
+  ]
+  // Agregá más móviles si tenés
+};
+
 
   // Cargar elementos
   useEffect(() => {
@@ -405,6 +430,38 @@ function App() {
             <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
           </div>
         )}
+
+        {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{mostrarMapa && movilSeleccionadoMapa && (
+  <div className="modal">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
+        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
+          × Cerrar
+        </button>
+      </div>
+      <div className="modal-body">
+        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
+        <div className="grid-2">
+          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
+            <div key={index} className="foto-item">
+              <img
+                src={url}
+                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
+                className="foto-img"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
+                }}
+              />
+              <p className="foto-label">Vista {index + 1}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
         {/* PANEL: REPORTE */}
         {mostrarReporte && (
@@ -896,11 +953,45 @@ function App() {
               >
                 🖨️ Imprimir Reporte
               </button>
+
+              {/* Botón: Mapa de Bauleras */}
+<div className="card">
+  <h3>📍 Mapa de Bauleras</h3>
+  <div style={{ marginBottom: '12px' }}>
+    <select
+      value={movilSeleccionadoMapa}
+      onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
+      className="input"
+    >
+      <option value="">Seleccionar Móvil</option>
+      <option value="18">Móvil 18</option>
+      <option value="2">Móvil 2</option>
+      <option value="3">Móvil 3</option>
+    </select>
+  </div>
+  <button
+    onClick={() => {
+      if (!movilSeleccionadoMapa) {
+        alert('Seleccioná un móvil');
+        return;
+      }
+      setMostrarMapa(true);
+    }}
+    className="btn btn-warning"
+  >
+    Ver Fotos del Móvil {movilSeleccionadoMapa}
+  </button>
+</div>
             </div>
           </div>
         </div>
+
+
+
       )}
     </div>
+    
+
   );
 }
 
