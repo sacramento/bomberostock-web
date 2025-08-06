@@ -234,9 +234,14 @@ function App() {
     return (
       <div className="container">
         <div className="header">
+        <div className="logo-container">
+          <svg className="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="2" fill="none" />
+          </svg>
           <h1>Materiales BV SMA</h1>
-          <div>Acceso público: búsqueda y reporte</div>
         </div>
+        <div>Acceso público: búsqueda y reporte</div>
+      </div>
 
         <div className="card login">
           <h3>🔐 Acceso para Operador/Admin</h3>
