@@ -835,6 +835,35 @@ const fotosPorMovil = {
           >
             Ver Reporte de Materiales
           </button>
+
+          {/* Botón: Mapa de Bauleras */}
+<div className="card">
+  <h3>📍 Mapa de Bauleras</h3>
+  <div style={{ marginBottom: '12px' }}>
+    <select
+      value={movilSeleccionadoMapa}
+      onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
+      className="input"
+    >
+      <option value="">Seleccionar Móvil</option>
+      <option value="18">Móvil 18</option>
+      <option value="2">Móvil 2</option>
+      <option value="3">Móvil 3</option>
+    </select>
+  </div>
+  <button
+    onClick={() => {
+      if (!movilSeleccionadoMapa) {
+        alert('Seleccioná un móvil');
+        return;
+      }
+      setMostrarMapa(true);
+    }}
+    className="btn btn-warning"
+  >
+    Ver Fotos del Móvil {movilSeleccionadoMapa}
+  </button>
+</div>
         </div>
       )}
 
@@ -954,34 +983,7 @@ const fotosPorMovil = {
                 🖨️ Imprimir Reporte
               </button>
 
-              {/* Botón: Mapa de Bauleras */}
-<div className="card">
-  <h3>📍 Mapa de Bauleras</h3>
-  <div style={{ marginBottom: '12px' }}>
-    <select
-      value={movilSeleccionadoMapa}
-      onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
-      className="input"
-    >
-      <option value="">Seleccionar Móvil</option>
-      <option value="18">Móvil 18</option>
-      <option value="2">Móvil 2</option>
-      <option value="3">Móvil 3</option>
-    </select>
-  </div>
-  <button
-    onClick={() => {
-      if (!movilSeleccionadoMapa) {
-        alert('Seleccioná un móvil');
-        return;
-      }
-      setMostrarMapa(true);
-    }}
-    className="btn btn-warning"
-  >
-    Ver Fotos del Móvil {movilSeleccionadoMapa}
-  </button>
-</div>
+              
             </div>
           </div>
         </div>
