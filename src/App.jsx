@@ -16,9 +16,7 @@ function App() {
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [movilSeleccionado, setMovilSeleccionado] = useState('');
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
-
-  const [mostrarMapa, setMostrarMapa] = useState(false);
-  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
+ const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
 
   const [legajo, setLegajo] = useState('');
   const [password, setPassword] = useState('');
@@ -414,18 +412,58 @@ const fotosPorMovil = {
       <option value="3">Móvil 3</option>
     </select>
   </div>
-  <button
-    onClick={() => {
-      if (!movilSeleccionadoMapa) {
-        alert('Seleccioná un móvil');
-        return;
-      }
-      setMostrarMapa(true);
-    }}
-    className="btn btn-warning"
-  >
-    Ver Fotos del Móvil {movilSeleccionadoMapa}
-  </button>
+ <button
+  onClick={() => {
+    if (!movilSeleccionadoMapa) {
+      alert('Seleccioná un móvil');
+      return;
+    }
+
+    // Generar HTML para la nueva ventana
+    const fotos = fotosPorMovil[movilSeleccionadoMapa] || [];
+    const fotosHTML = fotos.map((url, index) => `
+      <div style="text-align: center; margin: 20px 0;">
+        <img src="${url}" alt="Vista ${index + 1}" 
+             style="max-width: 100%; max-height: 300px; object-fit: contain; border: 2px solid #ddd; border-radius: 8px;" 
+             onerror="this.src='https://via.placeholder.com/300x200?text=Foto+no+cargada'; this.style.backgroundColor='#f0f0f0';">
+        <p style="margin: 8px 0 0 0; font-size: 14px; color: #555;">Vista ${index + 1}</p>
+      </div>
+    `).join('');
+
+    const contenido = `
+      <html>
+      <head>
+        <title>Fotos del Móvil ${movilSeleccionadoMapa}</title>
+        <style>
+          body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background-color: #f9f9f9; 
+            text-align: center; 
+          }
+          h2 { color: #b91c1c; }
+          .footer { margin-top: 40px; color: #666; font-size: 12px; }
+        </style>
+      </head>
+      <body>
+        <h2>📸 Fotos del Móvil ${movilSeleccionadoMapa}</h2>
+        ${fotosHTML}
+        <div class="footer">
+          BomberoStock • Vista generada automáticamente
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Abrir en nueva pestaña
+    const ventana = window.open('', '_blank');
+    ventana.document.write(contenido);
+    ventana.document.close();
+  }}
+  className="btn btn-warning"
+>
+  📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
+</button>
 </div>
 
         {element && (
@@ -460,37 +498,7 @@ const fotosPorMovil = {
           </div>
         )}
 
-        {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
-{mostrarMapa && movilSeleccionadoMapa && (
-  <div className="modal">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
-        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
-          × Cerrar
-        </button>
-      </div>
-      <div className="modal-body">
-        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
-        <div className="grid-2">
-          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
-            <div key={index} className="foto-item">
-              <img
-                src={url}
-                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
-                className="foto-img"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
-                }}
-              />
-              <p className="foto-label">Vista {index + 1}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+      
 
         {/* PANEL: REPORTE */}
         {mostrarReporte && (
