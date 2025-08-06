@@ -236,7 +236,7 @@ function App() {
         <div className="header">
         <div className="logo-container">
           <svg className="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path img src="/bvsma.svg" alt="Logo" className="logo" /> 
+            <path img src="/bv_sma.svg" alt="Logo" className="logo" /> 
           </svg>
           <h1>Materiales BV SMA</h1>
         </div>
