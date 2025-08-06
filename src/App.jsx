@@ -12,6 +12,7 @@ function App() {
   const [viendoUsuarios, setViendoUsuarios] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mostrarReporte, setMostrarReporte] = useState(false);
+
   const [filtroUbicacion, setFiltroUbicacion] = useState('');
   const [movilSeleccionado, setMovilSeleccionado] = useState('');
   const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
@@ -19,16 +20,7 @@ function App() {
   const [legajo, setLegajo] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const usuario = usuarios.find(u => u.legajo === legajo && u.password === password);
-    if (usuario && ['operador', 'admin'].includes(usuario.role)) {
-      setUser({ legajo: usuario.legajo, role: usuario.role });
-    } else {
-      alert('Acceso denegado. Solo operadores y admins.');
-    }
-  };
-
+  // Cargar elementos
   useEffect(() => {
     const cargarElementos = async () => {
       const { data, error } = await supabase.from('elementos').select('*');
@@ -45,6 +37,7 @@ function App() {
     cargarElementos();
   }, []);
 
+  // Cargar usuarios
   useEffect(() => {
     const cargarUsuarios = async () => {
       const { data, error } = await supabase.from('usuarios').select('*');
@@ -57,6 +50,18 @@ function App() {
     cargarUsuarios();
   }, []);
 
+  // Login
+  const handleLogin = (e) => {
+    e.preventDefault();
+    const usuario = usuarios.find(u => u.legajo === legajo && u.password === password);
+    if (usuario && ['operador', 'admin'].includes(usuario.role)) {
+      setUser({ legajo: usuario.legajo, role: usuario.role });
+    } else {
+      alert('Acceso denegado. Solo operadores y admins.');
+    }
+  };
+
+  // Búsqueda
   const handleSearch = () => {
     const code = searchCode.trim().toUpperCase();
     const found = elementos[code];
@@ -67,6 +72,7 @@ function App() {
     }
   };
 
+  // Función para abrir reporte en nueva pestaña
   const abrirReporteEnPestaña = () => {
     const elementosArray = Object.values(elementos);
     let elementosFiltrados = elementosArray;
@@ -223,35 +229,27 @@ function App() {
     ventana.document.close();
   };
 
+  // --- VISTA PÚBLICA ---
   if (!user) {
     return (
       <div className="container">
+        {/* Header */}
         <div className="header">
           <h1>Materiales BV SMA</h1>
           <div>Acceso público: búsqueda y reporte</div>
         </div>
 
+        {/* Login */}
         <div className="card login">
           <h3>🔐 Acceso para Operador/Admin</h3>
           <form onSubmit={handleLogin} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <input
-              type="text"
-              value={legajo}
-              onChange={(e) => setLegajo(e.target.value)}
-              placeholder="Legajo"
-              className="input"
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Contraseña"
-              className="input"
-            />
+            <input type="text" value={legajo} onChange={(e) => setLegajo(e.target.value)} placeholder="Legajo" className="input" />
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" className="input" />
             <button type="submit" className="btn btn-primary">Ingresar</button>
           </form>
         </div>
 
+        {/* Escanear QR */}
         <button
           onClick={async () => {
             const script = document.createElement('script');
@@ -290,6 +288,7 @@ function App() {
           📷 Escanear QR
         </button>
 
+        {/* Búsqueda */}
         <div className="card">
           <h2>🔍 Buscar por código</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -305,11 +304,13 @@ function App() {
           </div>
         </div>
 
+        {/* Reporte público */}
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
           <button onClick={() => setMostrarReporte(true)} className="btn btn-info">Ver Reporte</button>
         </div>
 
+        {/* Ficha del elemento */}
         {element && (
           <div className="card ficha">
             <button
@@ -319,9 +320,7 @@ function App() {
               ← Volver
             </button>
             <h2>{element.nombre}</h2>
-            {element.foto_url && (
-              <img src={element.foto_url} alt={element.nombre} />
-            )}
+            {element.foto_url && <img src={element.foto_url} alt={element.nombre} />}
             <p><strong>Tipo:</strong> {element.tipo}</p>
             <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
             <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
@@ -334,171 +333,139 @@ function App() {
           </div>
         )}
 
+        {/* PANEL: REPORTE */}
+        {mostrarReporte && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999,
+            padding: '20px'
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              width: '100%',
+              maxWidth: '800px',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+            }}>
+              <div style={{
+                padding: '20px',
+                borderBottom: '3px solid #b91c1c',
+                backgroundColor: '#b91c1c',
+                color: 'white',
+                borderTopLeftRadius: '12px',
+                borderTopRightRadius: '12px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
+                <button
+                  onClick={() => setMostrarReporte(false)}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#dc3545',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  × Cerrar
+                </button>
+              </div>
+
+              <div style={{ padding: '20px' }}>
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Ver:</label>
+                  <select
+                    value={filtroUbicacion}
+                    onChange={(e) => {
+                      setFiltroUbicacion(e.target.value);
+                      setMovilSeleccionado('');
+                      setDepositoSeleccionado('');
+                    }}
+                    className="input"
+                  >
+                    <option value="">Seleccionar...</option>
+                    <option value="todos">Todos los elementos</option>
+                    <option value="movil">Por Móvil</option>
+                    <option value="deposito">Por Depósito</option>
+                  </select>
+                </div>
+
+                {filtroUbicacion === 'movil' && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Móvil:</label>
+                    <select
+                      value={movilSeleccionado}
+                      onChange={(e) => setMovilSeleccionado(e.target.value)}
+                      className="input"
+                    >
+                      <option value="">Todos los móviles</option>
+                      {(() => {
+                        const moviles = new Set();
+                        Object.values(elementos).forEach(el => {
+                          if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                            moviles.add(el.ubicacion_id);
+                          }
+                        });
+                        return Array.from(moviles).sort().map(movil => (
+                          <option key={movil} value={movil}>Móvil {movil}</option>
+                        ));
+                      })()}
+                    </select>
+                  </div>
+                )}
+
+                {filtroUbicacion === 'deposito' && (
+                  <div style={{ marginBottom: '16px' }}>
+                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Depósito:</label>
+                    <select
+                      value={depositoSeleccionado}
+                      onChange={(e) => setDepositoSeleccionado(e.target.value)}
+                      className="input"
+                    >
+                      <option value="">Todos los depósitos</option>
+                      <option value="Depósito 1">Depósito 1</option>
+                      <option value="Depósito 2">Depósito 2</option>
+                    </select>
+                  </div>
+                )}
+
+                <button
+                  onClick={abrirReporteEnPestaña}
+                  className="btn btn-primary"
+                >
+                  🖨️ Imprimir Reporte
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
-  {/* PANEL: REPORTE (común a todas las vistas) */}
-{mostrarReporte && (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 9999,
-    padding: '20px'
-  }}>
-    <div style={{
-      backgroundColor: 'white',
-      borderRadius: '12px',
-      width: '100%',
-      maxWidth: '800px',
-      maxHeight: '90vh',
-      overflowY: 'auto',
-      boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-    }}>
-      <div style={{
-        padding: '20px',
-        borderBottom: '3px solid #b91c1c',
-        backgroundColor: '#b91c1c',
-        color: 'white',
-        borderTopLeftRadius: '12px',
-        borderTopRightRadius: '12px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center'
-      }}>
-        <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
-        <button
-          onClick={() => setMostrarReporte(false)}
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#dc3545',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          × Cerrar
-        </button>
-      </div>
-
-      <div style={{ padding: '20px' }}>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-            Ver:
-          </label>
-          <select
-            value={filtroUbicacion}
-            onChange={(e) => {
-              setFiltroUbicacion(e.target.value);
-              setMovilSeleccionado('');
-              setDepositoSeleccionado('');
-            }}
-            style={{
-              width: '100%',
-              padding: '10px',
-              border: '1px solid #ccc',
-              borderRadius: '6px',
-              fontSize: '16px'
-            }}
-          >
-            <option value="">Seleccionar...</option>
-            <option value="todos">Todos los elementos</option>
-            <option value="movil">Por Móvil</option>
-            <option value="deposito">Por Depósito</option>
-          </select>
-        </div>
-
-        {filtroUbicacion === 'movil' && (
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-              Seleccionar Móvil
-            </label>
-            <select
-              value={movilSeleccionado}
-              onChange={(e) => setMovilSeleccionado(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
-            >
-              <option value="">Todos los móviles</option>
-              {(() => {
-                const moviles = new Set();
-                Object.values(elementos).forEach(el => {
-                  if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
-                    moviles.add(el.ubicacion_id);
-                  }
-                });
-                return Array.from(moviles).sort().map(movil => (
-                  <option key={movil} value={movil}>Móvil {movil}</option>
-                ));
-              })()}
-            </select>
-          </div>
-        )}
-
-        {filtroUbicacion === 'deposito' && (
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>
-              Seleccionar Depósito
-            </label>
-            <select
-              value={depositoSeleccionado}
-              onChange={(e) => setDepositoSeleccionado(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px',
-                border: '1px solid #ccc',
-                borderRadius: '6px',
-                fontSize: '16px'
-              }}
-            >
-              <option value="">Todos los depósitos</option>
-              <option value="Depósito 1">Depósito 1</option>
-              <option value="Depósito 2">Depósito 2</option>
-            </select>
-          </div>
-        )}
-
-        <button
-          onClick={abrirReporteEnPestaña}
-          style={{
-            width: '100%',
-            padding: '14px',
-            backgroundColor: '#28a745',
-            color: 'white',
-            border: 'none',
-            borderRadius: '6px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer'
-          }}
-        >
-          🖨️ Imprimir Reporte
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
+  // --- VISTA PRIVADA ---
   return (
     <div className="container">
+      {/* Header */}
       <div className="header">
         <h1>Materiales BV SMA</h1>
         <p>Legajo: {user.legajo} • Rol: {user.role}</p>
       </div>
 
+      {/* Escanear QR */}
       <button
         onClick={() => {
           const code = prompt('Ingresa el código QR (ej: MAT-001)');
@@ -512,6 +479,7 @@ function App() {
         📷 Escanear QR
       </button>
 
+      {/* Búsqueda */}
       <div className="card">
         <h2>Buscar elemento</h2>
         <input
@@ -525,6 +493,7 @@ function App() {
         <button onClick={handleSearch} className="btn btn-secondary">Buscar</button>
       </div>
 
+      {/* Cargar elemento */}
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
         <div className="card">
           <h3>➕ Cargar nuevo elemento</h3>
@@ -537,6 +506,7 @@ function App() {
         </div>
       )}
 
+      {/* Formulario de carga */}
       {mostrarFormulario && (
         <FormularioCarga
           onClose={() => setMostrarFormulario(false)}
@@ -566,137 +536,112 @@ function App() {
       )}
 
       {/* Gestionar Usuarios (solo Admin) */}
-{user.role === 'admin' && !mostrarReporte && !mostrarFormulario && !element && (
-  <div className="card">
-    <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
-    <button
-      onClick={() => setViendoUsuarios(!viendoUsuarios)}
-      className="btn btn-warning"
-    >
-      👥 Gestionar Usuarios
-    </button>
-  </div>
-)}
+      {user.role === 'admin' && !mostrarFormulario && !element && (
+        <div className="card">
+          <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
+          <button
+            onClick={() => setViendoUsuarios(!viendoUsuarios)}
+            className="btn btn-warning"
+          >
+            👥 Gestionar Usuarios
+          </button>
+        </div>
+      )}
 
       {/* Panel: Gestionar Usuarios */}
-{viendoUsuarios && (
-  <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-      <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
-      <button
-        onClick={() => setViendoUsuarios(false)}
-        style={{ padding: '6px 12px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-      >
-        × Cerrar
-      </button>
-    </div>
+      {viendoUsuarios && user.role === 'admin' && (
+        <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
+            <button
+              onClick={() => setViendoUsuarios(false)}
+              style={{
+                padding: '6px 12px',
+                backgroundColor: '#dc3545',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              × Cerrar
+            </button>
+          </div>
 
-    {/* Solo el admin puede agregar */}
-    {user.role === 'admin' && (
-      <button
-        onClick={() => {
-          const legajo = prompt('Legajo (3 dígitos)');
-          if (!legajo || !/^\d{3}$/.test(legajo)) {
-            alert('Legajo debe ser de 3 dígitos');
-            return;
-          }
-          const nombre = prompt('Nombre');
-          if (!nombre) return;
-          const apellido = prompt('Apellido');
-          if (!apellido) return;
-          const password = prompt('Contraseña');
-          if (!password) return;
-          const rango = prompt('Rango (opcional)', '');
-          const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
-          const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
-          const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
-          const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
-          const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
-          const guardar = async () => {
-            const { error } = await supabase.from('usuarios').insert([nuevo]);
-            if (error) {
-              alert('Error: ' + error.message);
-            } else {
-              alert('✅ Usuario agregado');
-              const { data } = await supabase.from('usuarios').select('*');
-              setUsuarios(data);
-            }
-          };
-          guardar();
-        }}
-        style={{
-          backgroundColor: '#28a745',
-          color: 'white',
-          border: 'none',
-          padding: '10px 16px',
-          borderRadius: '6px',
-          fontSize: '14px',
-          fontWeight: 'bold',
-          marginBottom: '16px'
-        }}
-      >
-        + Agregar Usuario
-      </button>
-    )}
+          <button
+            onClick={() => {
+              const legajo = prompt('Legajo (3 dígitos)');
+              if (!legajo || !/^\d{3}$/.test(legajo)) {
+                alert('Legajo debe ser de 3 dígitos');
+                return;
+              }
+              const nombre = prompt('Nombre');
+              if (!nombre) return;
+              const apellido = prompt('Apellido');
+              if (!apellido) return;
+              const password = prompt('Contraseña');
+              if (!password) return;
+              const rango = prompt('Rango (opcional)', '');
+              const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
+              const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
+              const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
+              const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
+              const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
+              const guardar = async () => {
+                const { error } = await supabase.from('usuarios').insert([nuevo]);
+                if (error) {
+                  alert('Error: ' + error.message);
+                } else {
+                  alert('✅ Usuario agregado');
+                  const { data } = await supabase.from('usuarios').select('*');
+                  setUsuarios(data);
+                }
+              };
+              guardar();
+            }}
+            style={{
+              backgroundColor: '#28a745',
+              color: 'white',
+              border: 'none',
+              padding: '10px 16px',
+              borderRadius: '6px',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              marginBottom: '16px'
+            }}
+          >
+            + Agregar Usuario
+          </button>
 
-    <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px' }}>
-      {usuarios.length === 0 ? (
-        <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
-      ) : (
-        usuarios.map(u => (
-          <div key={u.id} style={{ padding: '12px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong>{u.nombre} {u.apellido}</strong> ({u.legajo})
-              </div>
-              <div>
-                {/* Solo el admin puede editar y eliminar */}
-                {user.role === 'admin' && (
-                  <>
-                    <button
-                      onClick={() => {
-                        const nuevoNombre = prompt('Nombre', u.nombre);
-                        const nuevoApellido = prompt('Apellido', u.apellido);
-                        const nuevoRango = prompt('Rango', u.rango || '');
-                        const nuevoCuartel = prompt('Cuartel', u.cuartel);
-                        const nuevoRole = prompt('Rol', u.role);
-                        const editar = async () => {
-                          const { error } = await supabase
-                            .from('usuarios')
-                            .update({
-                              nombre: nuevoNombre,
-                              apellido: nuevoApellido,
-                              rango: nuevoRango || null,
-                              cuartel: nuevoCuartel,
-                              role: ['lectura', 'operador', 'admin'].includes(nuevoRole) ? nuevoRole : u.role
-                            })
-                            .eq('id', u.id);
-                          if (error) {
-                            alert('Error: ' + error.message);
-                          } else {
-                            const { data } = await supabase.from('usuarios').select('*');
-                            setUsuarios(data);
-                          }
-                        };
-                        editar();
-                      }}
-                      style={{
-                        padding: '6px 10px',
-                        backgroundColor: '#ffc107',
-                        color: 'black',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        marginRight: '8px'
-                      }}
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      onClick={() => {
-                        if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
-                          const borrar = async () => {
-                            const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+          <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px' }}>
+            {usuarios.length === 0 ? (
+              <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
+            ) : (
+              usuarios.map(u => (
+                <div key={u.id} style={{ padding: '12px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <strong>{u.nombre} {u.apellido}</strong> ({u.legajo})
+                    </div>
+                    <div>
+                      <button
+                        onClick={() => {
+                          const nuevoNombre = prompt('Nombre', u.nombre);
+                          const nuevoApellido = prompt('Apellido', u.apellido);
+                          const nuevoRango = prompt('Rango', u.rango || '');
+                          const nuevoCuartel = prompt('Cuartel', u.cuartel);
+                          const nuevoRole = prompt('Rol', u.role);
+                          const editar = async () => {
+                            const { error } = await supabase
+                              .from('usuarios')
+                              .update({
+                                nombre: nuevoNombre,
+                                apellido: nuevoApellido,
+                                rango: nuevoRango || null,
+                                cuartel: nuevoCuartel,
+                                role: ['lectura', 'operador', 'admin'].includes(nuevoRole) ? nuevoRole : u.role
+                              })
+                              .eq('id', u.id);
                             if (error) {
                               alert('Error: ' + error.message);
                             } else {
@@ -704,34 +649,59 @@ function App() {
                               setUsuarios(data);
                             }
                           };
-                          borrar();
-                        }
-                      }}
-                      style={{
-                        padding: '6px 10px',
-                        backgroundColor: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-            <div style={{ fontSize: '14px', color: '#555' }}>
-              <span>Rango: {u.rango || '–'}</span> • <span>Cuartel: {u.cuartel || '–'}</span> • <span>Rol: {u.role}</span>
-            </div>
+                          editar();
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          backgroundColor: '#ffc107',
+                          color: 'black',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          marginRight: '8px'
+                        }}
+                      >
+                        ✏️
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
+                            const borrar = async () => {
+                              const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+                              if (error) {
+                                alert('Error: ' + error.message);
+                              } else {
+                                const { data } = await supabase.from('usuarios').select('*');
+                                setUsuarios(data);
+                              }
+                            };
+                            borrar();
+                          }
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          backgroundColor: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                  <div style={{ fontSize: '14px', color: '#555' }}>
+                    <span>Rango: {u.rango || '–'}</span> • <span>Cuartel: {u.cuartel || '–'}</span> • <span>Rol: {u.role}</span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        ))
+        </div>
       )}
-    </div>
-  </div>
-)}
 
+      {/* Ficha del elemento */}
       {element && (
         <div className="card ficha">
           <button
@@ -741,9 +711,7 @@ function App() {
             ← Volver
           </button>
           <h2>{element.nombre}</h2>
-          {element.foto_url && (
-            <img src={element.foto_url} alt={element.nombre} />
-          )}
+          {element.foto_url && <img src={element.foto_url} alt={element.nombre} />}
           <p><strong>Tipo:</strong> {element.tipo}</p>
           <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
           <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
@@ -756,18 +724,138 @@ function App() {
         </div>
       )}
 
-      {/* Botón: Reporte de Materiales */}
+      {/* Reporte en modo privado */}
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
-      <div className="card">
-        <h3>📋 Reporte de Materiales</h3>
-        <button
-          onClick={() => setMostrarReporte(true)}
-          className="btn btn-info"
-        >
-          Ver Reporte de Materiales
-        </button>
-      </div>
-)}
+        <div className="card">
+          <h3>📋 Reporte de Materiales</h3>
+          <button
+            onClick={() => setMostrarReporte(true)}
+            className="btn btn-info"
+          >
+            Ver Reporte de Materiales
+          </button>
+        </div>
+      )}
+
+      {/* PANEL: REPORTE (común a todas las vistas) */}
+      {mostrarReporte && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 9999,
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            width: '100%',
+            maxWidth: '800px',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{
+              padding: '20px',
+              borderBottom: '3px solid #b91c1c',
+              backgroundColor: '#b91c1c',
+              color: 'white',
+              borderTopLeftRadius: '12px',
+              borderTopRightRadius: '12px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center'
+            }}>
+              <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
+              <button
+                onClick={() => setMostrarReporte(false)}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: '#dc3545',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer'
+                }}
+              >
+                × Cerrar
+              </button>
+            </div>
+
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Ver:</label>
+                <select
+                  value={filtroUbicacion}
+                  onChange={(e) => {
+                    setFiltroUbicacion(e.target.value);
+                    setMovilSeleccionado('');
+                    setDepositoSeleccionado('');
+                  }}
+                  className="input"
+                >
+                  <option value="">Seleccionar...</option>
+                  <option value="todos">Todos los elementos</option>
+                  <option value="movil">Por Móvil</option>
+                  <option value="deposito">Por Depósito</option>
+                </select>
+              </div>
+
+              {filtroUbicacion === 'movil' && (
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Móvil:</label>
+                  <select
+                    value={movilSeleccionado}
+                    onChange={(e) => setMovilSeleccionado(e.target.value)}
+                    className="input"
+                  >
+                    <option value="">Todos los móviles</option>
+                    {(() => {
+                      const moviles = new Set();
+                      Object.values(elementos).forEach(el => {
+                        if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                          moviles.add(el.ubicacion_id);
+                        }
+                      });
+                      return Array.from(moviles).sort().map(movil => (
+                        <option key={movil} value={movil}>Móvil {movil}</option>
+                      ));
+                    })()}
+                  </select>
+                </div>
+              )}
+
+              {filtroUbicacion === 'deposito' && (
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Depósito:</label>
+                  <select
+                    value={depositoSeleccionado}
+                    onChange={(e) => setDepositoSeleccionado(e.target.value)}
+                    className="input"
+                  >
+                    <option value="">Todos los depósitos</option>
+                    <option value="Depósito 1">Depósito 1</option>
+                    <option value="Depósito 2">Depósito 2</option>
+                  </select>
+                </div>
+              )}
+
+              <button
+                onClick={abrirReporteEnPestaña}
+                className="btn btn-primary"
+              >
+                🖨️ Imprimir Reporte
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
