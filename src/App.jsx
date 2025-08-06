@@ -234,12 +234,10 @@ function App() {
     return (
       <div className="container">
         <div className="header">
-        <div className="logo-container">
-          <svg className="logo" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path img src="/bv_sma.svg" alt="Logo" className="logo" /> 
-          </svg>
-          <h1>Materiales BV SMA</h1>
-        </div>
+          <div className="logo-container">
+            <img src="/bvsma.svg" alt="Logo" className="logo" />
+            <h1>Materiales BV SMA</h1>
+          </div>
         <div>Acceso público: búsqueda y reporte</div>
       </div>
 
