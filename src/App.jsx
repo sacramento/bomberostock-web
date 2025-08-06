@@ -757,27 +757,6 @@ function App() {
         </div>
       )}
 
-      {element && (
-        <div className="card ficha">
-          <button
-            onClick={() => setElement(null)}
-            style={{ color: 'blue', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '16px' }}
-          >
-            ← Volver
-          </button>
-          <h2>{element.nombre}</h2>
-          {element.foto_url && <img src={element.foto_url} alt={element.nombre} />}
-          <p><strong>Tipo:</strong> {element.tipo}</p>
-          <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
-          <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
-          <p><strong>Ubicación:</strong> 
-            {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
-              ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
-              : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
-          </p>
-          <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
-        </div>
-      )}
 
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
         <div className="card">
