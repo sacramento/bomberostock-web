@@ -51,7 +51,7 @@ body {
 }
 
 .header .logo {
-  height: 40px; /* Ajustable */
+  height: 60px; /* Ajustable */
   width: auto;
   max-width: 100%;
   fill: white;
