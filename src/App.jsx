@@ -197,7 +197,7 @@ function App() {
       `;
       elementosFiltrados.forEach(el => {
         const ubicacion = el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
-          ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? ', Baulera ' + el.baulera_numero : ''}`
+          ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
           : el.deposito_nombre || '–';
 
         contenido += `
@@ -233,13 +233,11 @@ function App() {
   if (!user) {
     return (
       <div className="container">
-        {/* Header */}
         <div className="header">
           <h1>Materiales BV SMA</h1>
           <div>Acceso público: búsqueda y reporte</div>
         </div>
 
-        {/* Login */}
         <div className="card login">
           <h3>🔐 Acceso para Operador/Admin</h3>
           <form onSubmit={handleLogin} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -249,7 +247,6 @@ function App() {
           </form>
         </div>
 
-        {/* Escanear QR */}
         <button
           onClick={async () => {
             const script = document.createElement('script');
@@ -288,7 +285,6 @@ function App() {
           📷 Escanear QR
         </button>
 
-        {/* Búsqueda */}
         <div className="card">
           <h2>🔍 Buscar por código</h2>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -304,13 +300,11 @@ function App() {
           </div>
         </div>
 
-        {/* Reporte público */}
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
           <button onClick={() => setMostrarReporte(true)} className="btn btn-info">Ver Reporte</button>
         </div>
 
-        {/* Ficha del elemento */}
         {element && (
           <div className="card ficha">
             <button
@@ -459,13 +453,11 @@ function App() {
   // --- VISTA PRIVADA ---
   return (
     <div className="container">
-      {/* Header */}
       <div className="header">
         <h1>Materiales BV SMA</h1>
         <p>Legajo: {user.legajo} • Rol: {user.role}</p>
       </div>
 
-      {/* Escanear QR */}
       <button
         onClick={() => {
           const code = prompt('Ingresa el código QR (ej: MAT-001)');
@@ -479,7 +471,6 @@ function App() {
         📷 Escanear QR
       </button>
 
-      {/* Búsqueda */}
       <div className="card">
         <h2>Buscar elemento</h2>
         <input
@@ -493,7 +484,6 @@ function App() {
         <button onClick={handleSearch} className="btn btn-secondary">Buscar</button>
       </div>
 
-      {/* Cargar elemento */}
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
         <div className="card">
           <h3>➕ Cargar nuevo elemento</h3>
@@ -506,7 +496,6 @@ function App() {
         </div>
       )}
 
-      {/* Formulario de carga */}
       {mostrarFormulario && (
         <FormularioCarga
           onClose={() => setMostrarFormulario(false)}
@@ -535,7 +524,6 @@ function App() {
         />
       )}
 
-      {/* Gestionar Usuarios (solo Admin) */}
       {user.role === 'admin' && !mostrarFormulario && !element && (
         <div className="card">
           <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
@@ -548,7 +536,6 @@ function App() {
         </div>
       )}
 
-      {/* Panel: Gestionar Usuarios */}
       {viendoUsuarios && user.role === 'admin' && (
         <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -701,7 +688,6 @@ function App() {
         </div>
       )}
 
-      {/* Ficha del elemento */}
       {element && (
         <div className="card ficha">
           <button
@@ -724,7 +710,6 @@ function App() {
         </div>
       )}
 
-      {/* Reporte en modo privado */}
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
@@ -737,7 +722,7 @@ function App() {
         </div>
       )}
 
-      {/* PANEL: REPORTE (común a todas las vistas) */}
+      {/* PANEL: REPORTE */}
       {mostrarReporte && (
         <div style={{
           position: 'fixed',
