@@ -382,6 +382,16 @@ function App() {
             >
               ← Volver
             </button>
+              {user && ['operador', 'admin'].includes(user.role) && (
+                <button
+                  onClick={() => setMostrarFormulario({ ...element })}
+                  className="btn btn-warning"
+                  style={{ marginBottom: '16px' }}
+                >
+                  ✏️ Editar Elemento
+                </button>
+              )}
+
             <h2>{element.nombre}</h2>
             {element.foto_url && <img src={element.foto_url} alt={element.nombre} />}
             <p><strong>Tipo:</strong> {element.tipo}</p>
@@ -756,6 +766,7 @@ function App() {
           </div>
         </div>
       )}
+
 
 
       {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
