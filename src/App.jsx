@@ -16,7 +16,8 @@ function App() {
   const [filtroUbicacion, setFiltroUbicacion] = useState("");
   const [movilSeleccionado, setMovilSeleccionado] = useState("");
   const [depositoSeleccionado, setDepositoSeleccionado] = useState("");
-  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState("");
+  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
+ 
 
   const [legajo, setLegajo] = useState("");
   const [password, setPassword] = useState("");
@@ -278,50 +279,22 @@ function App() {
     ventana.document.close();
   };
 
-  {
-    /* PANEL: FOTOS DE BAULERAS POR MÓVIL */
-  }
-  {
-    mostrarMapa && movilSeleccionadoMapa && (
-      <div className="modal">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
-            <button
-              onClick={() => setMostrarMapa(false)}
-              className="btn btn-danger"
-            >
-              × Cerrar
-            </button>
-          </div>
-          <div className="modal-body">
-            <p>
-              Estás viendo las vistas del{" "}
-              <strong>Móvil {movilSeleccionadoMapa}</strong>
-            </p>
-            <div className="grid-2">
-              {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
-                <div key={index} className="foto-item">
-                  <img
-                    src={url}
-                    alt={`Vista ${
-                      index + 1
-                    } del Móvil ${movilSeleccionadoMapa}`}
-                    className="foto-img"
-                    onError={(e) => {
-                      e.target.src =
-                        "https://via.placeholder.com/300x200?text=Foto+no+cargada";
-                    }}
-                  />
-                  <p className="foto-label">Vista {index + 1}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+  {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{mostrarMapa && movilSeleccionadoMapa && (
+  <div className="modal">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
+        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
+          × Cerrar
+        </button>
       </div>
-    );
-  }
+      <div className="modal-body">
+        ...
+      </div>
+    </div>
+  </div>
+)}
 
   // --- VISTA PÚBLICA ---
   if (!user) {
@@ -494,34 +467,34 @@ function App() {
           </button>
         </div>
 
-        {/* Botón: Mapa de Bauleras */}
-        <div className="card">
-          <h3>📍 Mapa de Bauleras</h3>
-          <div style={{ marginBottom: "12px" }}>
-            <select
-              value={movilSeleccionadoMapa}
-              onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
-              className="input"
-            >
-              <option value="">Seleccionar Móvil</option>
-              <option value="18">Móvil 18</option>
-              <option value="2">Móvil 2</option>
-              <option value="3">Móvil 3</option>
-            </select>
-          </div>
-          <button
-            onClick={() => {
-              if (!movilSeleccionadoMapa) {
-                alert("Seleccioná un móvil");
-                return;
-              }
-              setMostrarMapa(true);
-            }}
-            className="btn btn-warning"
-          >
-            📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
-          </button>
-        </div>
+       {/* Botón: Mapa de Bauleras */}
+<div className="card">
+  <h3>📍 Mapa de Bauleras</h3>
+  <div style={{ marginBottom: '12px' }}>
+    <select
+      value={movilSeleccionadoMapa}
+      onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
+      className="input"
+    >
+      <option value="">Seleccionar Móvil</option>
+      <option value="18">Móvil 18</option>
+      <option value="2">Móvil 2</option>
+      <option value="3">Móvil 3</option>
+    </select>
+  </div>
+  <button
+    onClick={() => {
+      if (!movilSeleccionadoMapa) {
+        alert('Seleccioná un móvil');
+        return;
+      }
+      setMostrarMapa(true);
+    }}
+    className="btn btn-warning"
+  >
+    📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
+  </button>
+</div>
 
         {/* MODAL: DETALLE DEL ELEMENTO */}
         {element && (
