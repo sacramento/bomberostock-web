@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
-import { supabase } from './lib/supabase';
-import FormularioCarga from './components/FormularioCarga.jsx';
-import './styles.css';
+import { useEffect, useState } from "react";
+import { supabase } from "./lib/supabase";
+import FormularioCarga from "./components/FormularioCarga.jsx";
+import "./styles.css";
 
 function App() {
   const [user, setUser] = useState(null);
-  const [searchCode, setSearchCode] = useState('');
+  const [searchCode, setSearchCode] = useState("");
   const [element, setElement] = useState(null);
   const [elementos, setElementos] = useState({});
   const [usuarios, setUsuarios] = useState([]);
@@ -13,47 +13,46 @@ function App() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mostrarReporte, setMostrarReporte] = useState(false);
 
-  const [filtroUbicacion, setFiltroUbicacion] = useState('');
-  const [movilSeleccionado, setMovilSeleccionado] = useState('');
-  const [depositoSeleccionado, setDepositoSeleccionado] = useState('');
- const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState('');
+  const [filtroUbicacion, setFiltroUbicacion] = useState("");
+  const [movilSeleccionado, setMovilSeleccionado] = useState("");
+  const [depositoSeleccionado, setDepositoSeleccionado] = useState("");
+  const [movilSeleccionadoMapa, setMovilSeleccionadoMapa] = useState("");
 
-  const [legajo, setLegajo] = useState('');
-  const [password, setPassword] = useState('');
+  const [legajo, setLegajo] = useState("");
+  const [password, setPassword] = useState("");
 
   const [mostrarMapa, setMostrarMapa] = useState(false);
 
-const fotosPorMovil = {
-  '18': [
-    'https://i.ibb.co/C3gdmtJ2/18-acompan-ante.jpg',
-    'https://i.ibb.co/KpRJBPgZ/18-conductor.jpg',
-    'https://i.ibb.co/rS0K8mt/18-trasera.jpg',
-  ],
-  '2': [
-    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M2',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M2',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M2',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M2'
-  ],
-  '3': [
-    'https://drive.google.com/uc?export=view&id=ID_FOTO1_M3',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO2_M3',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO3_M3',
-    'https://drive.google.com/uc?export=view&id=ID_FOTO4_M3'
-  ]
-  // Agregá más móviles si tenés
-};
-
+  const fotosPorMovil = {
+    18: [
+      "https://i.ibb.co/C3gdmtJ2/18-acompan-ante.jpg",
+      "https://i.ibb.co/KpRJBPgZ/18-conductor.jpg",
+      "https://i.ibb.co/rS0K8mt/18-trasera.jpg",
+    ],
+    2: [
+      "https://drive.google.com/uc?export=view&id=ID_FOTO1_M2",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO2_M2",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO3_M2",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO4_M2",
+    ],
+    3: [
+      "https://drive.google.com/uc?export=view&id=ID_FOTO1_M3",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO2_M3",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO3_M3",
+      "https://drive.google.com/uc?export=view&id=ID_FOTO4_M3",
+    ],
+    // Agregá más móviles si tenés
+  };
 
   // Cargar elementos
   useEffect(() => {
     const cargarElementos = async () => {
-      const { data, error } = await supabase.from('elementos').select('*');
+      const { data, error } = await supabase.from("elementos").select("*");
       if (error) {
-        alert('Error: ' + error.message);
+        alert("Error: " + error.message);
       } else {
         const map = {};
-        data.forEach(el => {
+        data.forEach((el) => {
           map[el.codigo_qr] = el;
         });
         setElementos(map);
@@ -65,9 +64,9 @@ const fotosPorMovil = {
   // Cargar usuarios
   useEffect(() => {
     const cargarUsuarios = async () => {
-      const { data, error } = await supabase.from('usuarios').select('*');
+      const { data, error } = await supabase.from("usuarios").select("*");
       if (error) {
-        console.error('Error al cargar usuarios:', error);
+        console.error("Error al cargar usuarios:", error);
       } else {
         setUsuarios(data);
       }
@@ -78,11 +77,13 @@ const fotosPorMovil = {
   // Login
   const handleLogin = (e) => {
     e.preventDefault();
-    const usuario = usuarios.find(u => u.legajo === legajo && u.password === password);
-    if (usuario && ['operador', 'admin'].includes(usuario.role)) {
+    const usuario = usuarios.find(
+      (u) => u.legajo === legajo && u.password === password
+    );
+    if (usuario && ["operador", "admin"].includes(usuario.role)) {
       setUser({ legajo: usuario.legajo, role: usuario.role });
     } else {
-      alert('Acceso denegado. Solo operadores y admins.');
+      alert("Acceso denegado. Solo operadores y admins.");
     }
   };
 
@@ -93,7 +94,7 @@ const fotosPorMovil = {
     if (found) {
       setElement(found);
     } else {
-      alert('Elemento no encontrado');
+      alert("Elemento no encontrado");
     }
   };
 
@@ -102,23 +103,26 @@ const fotosPorMovil = {
     const elementosArray = Object.values(elementos);
     let elementosFiltrados = elementosArray;
 
-    if (filtroUbicacion === 'movil' && movilSeleccionado) {
+    if (filtroUbicacion === "movil" && movilSeleccionado) {
       elementosFiltrados = elementosArray.filter(
-        el => el.ubicacion_tipo === 'Móvil' && el.ubicacion_id === movilSeleccionado
+        (el) =>
+          el.ubicacion_tipo === "Móvil" && el.ubicacion_id === movilSeleccionado
       );
-    } else if (filtroUbicacion === 'movil') {
-      elementosFiltrados = elementosArray.filter(el => el.ubicacion_tipo === 'Móvil');
+    } else if (filtroUbicacion === "movil") {
+      elementosFiltrados = elementosArray.filter(
+        (el) => el.ubicacion_tipo === "Móvil"
+      );
     }
 
-    if (filtroUbicacion === 'deposito' && depositoSeleccionado) {
+    if (filtroUbicacion === "deposito" && depositoSeleccionado) {
       elementosFiltrados = elementosArray.filter(
-        el => el.deposito_nombre === depositoSeleccionado
+        (el) => el.deposito_nombre === depositoSeleccionado
       );
-    } else if (filtroUbicacion === 'deposito') {
-      elementosFiltrados = elementosArray.filter(el => el.deposito_nombre);
+    } else if (filtroUbicacion === "deposito") {
+      elementosFiltrados = elementosArray.filter((el) => el.deposito_nombre);
     }
 
-    if (filtroUbicacion === 'todos' || !filtroUbicacion) {
+    if (filtroUbicacion === "todos" || !filtroUbicacion) {
       elementosFiltrados = Object.values(elementos);
     }
 
@@ -148,59 +152,69 @@ const fotosPorMovil = {
           × Cerrar
         </button>
         <h1>📋 Reporte de Materiales</h1>
-        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+        <p><strong>Fecha:</strong> ${new Date().toLocaleDateString("es-ES")}</p>
     `;
 
-    if (filtroUbicacion === 'movil' && !movilSeleccionado) {
+    if (filtroUbicacion === "movil" && !movilSeleccionado) {
       const moviles = {};
-      elementosFiltrados.forEach(el => {
+      elementosFiltrados.forEach((el) => {
         if (!moviles[el.ubicacion_id]) moviles[el.ubicacion_id] = [];
         moviles[el.ubicacion_id].push(el);
       });
 
-      Object.keys(moviles).sort().forEach(movil => {
-        contenido += `<h3>Móvil ${movil}</h3>`;
-        contenido += `
+      Object.keys(moviles)
+        .sort()
+        .forEach((movil) => {
+          contenido += `<h3>Móvil ${movil}</h3>`;
+          contenido += `
           <table>
             <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Baulera</th></tr></thead>
             <tbody>
         `;
-        moviles[movil].forEach(el => {
-          contenido += `
+          moviles[movil].forEach((el) => {
+            contenido += `
             <tr>
               <td>${el.nombre}</td>
               <td>${el.tipo}</td>
               <td style="color: ${
-                el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+                el.estado === "Bueno"
+                  ? "green"
+                  : el.estado === "Regular"
+                  ? "orange"
+                  : "red"
               }; font-weight:bold;">
                 ${el.estado}
               </td>
-              <td>${el.baulera_numero || '–'}</td>
+              <td>${el.baulera_numero || "–"}</td>
             </tr>
           `;
+          });
+          contenido += `</tbody></table>`;
         });
-        contenido += `</tbody></table>`;
-      });
-    } else if (filtroUbicacion === 'deposito' && !depositoSeleccionado) {
-      const depositos = { 'Depósito 1': [], 'Depósito 2': [] };
-      elementosFiltrados.forEach(el => {
+    } else if (filtroUbicacion === "deposito" && !depositoSeleccionado) {
+      const depositos = { "Depósito 1": [], "Depósito 2": [] };
+      elementosFiltrados.forEach((el) => {
         if (el.deposito_nombre) depositos[el.deposito_nombre].push(el);
       });
 
-      Object.keys(depositos).forEach(dep => {
+      Object.keys(depositos).forEach((dep) => {
         contenido += `<h3>${dep}</h3>`;
         contenido += `
           <table>
             <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th></tr></thead>
             <tbody>
         `;
-        depositos[dep].forEach(el => {
+        depositos[dep].forEach((el) => {
           contenido += `
             <tr>
               <td>${el.nombre}</td>
               <td>${el.tipo}</td>
               <td style="color: ${
-                el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+                el.estado === "Bueno"
+                  ? "green"
+                  : el.estado === "Regular"
+                  ? "orange"
+                  : "red"
               }; font-weight:bold;">
                 ${el.estado}
               </td>
@@ -210,9 +224,12 @@ const fotosPorMovil = {
         contenido += `</tbody></table>`;
       });
     } else {
-      const titulo = filtroUbicacion === 'movil' && movilSeleccionado ? `Móvil ${movilSeleccionado}` :
-                     filtroUbicacion === 'deposito' && depositoSeleccionado ? depositoSeleccionado :
-                     'Todos los elementos';
+      const titulo =
+        filtroUbicacion === "movil" && movilSeleccionado
+          ? `Móvil ${movilSeleccionado}`
+          : filtroUbicacion === "deposito" && depositoSeleccionado
+          ? depositoSeleccionado
+          : "Todos los elementos";
 
       contenido += `<h3>${titulo}</h3>`;
       contenido += `
@@ -220,17 +237,24 @@ const fotosPorMovil = {
           <thead><tr><th>Nombre</th><th>Tipo</th><th>Estado</th><th>Ubicación</th></tr></thead>
           <tbody>
       `;
-      elementosFiltrados.forEach(el => {
-        const ubicacion = el.ubicacion_tipo === 'Móvil' && el.ubicacion_id
-          ? `Móvil ${el.ubicacion_id}${el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ''}`
-          : el.deposito_nombre || '–';
+      elementosFiltrados.forEach((el) => {
+        const ubicacion =
+          el.ubicacion_tipo === "Móvil" && el.ubicacion_id
+            ? `Móvil ${el.ubicacion_id}${
+                el.baulera_numero ? `, Baulera ${el.baulera_numero}` : ""
+              }`
+            : el.deposito_nombre || "–";
 
         contenido += `
           <tr>
             <td>${el.nombre}</td>
             <td>${el.tipo}</td>
             <td style="color: ${
-              el.estado === 'Bueno' ? 'green' : el.estado === 'Regular' ? 'orange' : 'red'
+              el.estado === "Bueno"
+                ? "green"
+                : el.estado === "Regular"
+                ? "orange"
+                : "red"
             }; font-weight:bold;">
               ${el.estado}
             </td>
@@ -249,42 +273,55 @@ const fotosPorMovil = {
       </html>
     `;
 
-    const ventana = window.open('', '_blank');
+    const ventana = window.open("", "_blank");
     ventana.document.write(contenido);
     ventana.document.close();
   };
 
-{/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
-{mostrarMapa && movilSeleccionadoMapa && (
-  <div className="modal">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
-        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
-          × Cerrar
-        </button>
-      </div>
-      <div className="modal-body">
-        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
-        <div className="grid-2">
-          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
-            <div key={index} className="foto-item">
-              <img
-                src={url}
-                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
-                className="foto-img"
-                onError={(e) => {
-                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
-                }}
-              />
-              <p className="foto-label">Vista {index + 1}</p>
+  {
+    /* PANEL: FOTOS DE BAULERAS POR MÓVIL */
+  }
+  {
+    mostrarMapa && movilSeleccionadoMapa && (
+      <div className="modal">
+        <div className="modal-content">
+          <div className="modal-header">
+            <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
+            <button
+              onClick={() => setMostrarMapa(false)}
+              className="btn btn-danger"
+            >
+              × Cerrar
+            </button>
+          </div>
+          <div className="modal-body">
+            <p>
+              Estás viendo las vistas del{" "}
+              <strong>Móvil {movilSeleccionadoMapa}</strong>
+            </p>
+            <div className="grid-2">
+              {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
+                <div key={index} className="foto-item">
+                  <img
+                    src={url}
+                    alt={`Vista ${
+                      index + 1
+                    } del Móvil ${movilSeleccionadoMapa}`}
+                    className="foto-img"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://via.placeholder.com/300x200?text=Foto+no+cargada";
+                    }}
+                  />
+                  <p className="foto-label">Vista {index + 1}</p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
       </div>
-    </div>
-  </div>
-)}
+    );
+  }
 
   // --- VISTA PÚBLICA ---
   if (!user) {
@@ -295,146 +332,172 @@ const fotosPorMovil = {
             <img src="/bvsma.svg" alt="Logo" className="logo" />
             <h1>Materiales BV SMA</h1>
           </div>
-        <div>Acceso público: búsqueda y reporte</div>
-      </div>
+          <div>Acceso público: búsqueda y reporte</div>
+        </div>
 
         <div className="card login">
           <h3>🔐 Acceso para Operador/Admin</h3>
-          <form onSubmit={handleLogin} style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-            <input type="text" value={legajo} onChange={(e) => setLegajo(e.target.value)} placeholder="Legajo" className="input" />
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" className="input" />
-            <button type="submit" className="btn btn-primary">Ingresar</button>
+          <form
+            onSubmit={handleLogin}
+            style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
+          >
+            <input
+              type="text"
+              value={legajo}
+              onChange={(e) => setLegajo(e.target.value)}
+              placeholder="Legajo"
+              className="input"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Contraseña"
+              className="input"
+            />
+            <button type="submit" className="btn btn-primary">
+              Ingresar
+            </button>
           </form>
         </div>
 
-       <button
-  onClick={async () => {
-    const script = document.createElement('script');
-    script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
-    script.onload = () => {
-      // Overlay de fondo negro
-      const overlay = document.createElement('div');
-      overlay.style.position = 'fixed';
-      overlay.style.top = 0;
-      overlay.style.left = 0;
-      overlay.style.width = '100vw';
-      overlay.style.height = '100vh';
-      overlay.style.backgroundColor = '#000';
-      overlay.style.zIndex = '9999';
-      overlay.style.display = 'flex';
-      overlay.style.flexDirection = 'column';
-      overlay.style.alignItems = 'center';
-      overlay.style.justifyContent = 'center';
-      overlay.style.padding = '20px';
+        <button
+          onClick={async () => {
+            const script = document.createElement("script");
+            script.src =
+              "https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js";
+            script.onload = () => {
+              // Overlay de fondo negro
+              const overlay = document.createElement("div");
+              overlay.style.position = "fixed";
+              overlay.style.top = 0;
+              overlay.style.left = 0;
+              overlay.style.width = "100vw";
+              overlay.style.height = "100vh";
+              overlay.style.backgroundColor = "#000";
+              overlay.style.zIndex = "9999";
+              overlay.style.display = "flex";
+              overlay.style.flexDirection = "column";
+              overlay.style.alignItems = "center";
+              overlay.style.justifyContent = "center";
+              overlay.style.padding = "20px";
 
-      // Contenedor del escáner
-      const container = document.createElement('div');
-      container.id = 'qr-reader';
-      container.style.width = '100%';
-      container.style.maxWidth = '100%';
-      container.style.height = '80vh';
-      container.style.borderRadius = '12px';
-      container.style.overflow = 'hidden';
-      container.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+              // Contenedor del escáner
+              const container = document.createElement("div");
+              container.id = "qr-reader";
+              container.style.width = "100%";
+              container.style.maxWidth = "100%";
+              container.style.height = "80vh";
+              container.style.borderRadius = "12px";
+              container.style.overflow = "hidden";
+              container.style.boxShadow = "0 4px 20px rgba(0,0,0,0.5)";
 
-      // Botón de cerrar
-      const cancelBtn = document.createElement('button');
-      cancelBtn.textContent = '❌ Cerrar';
-      cancelBtn.style.padding = '14px 24px';
-      cancelBtn.style.backgroundColor = '#dc3545';
-      cancelBtn.style.color = 'white';
-      cancelBtn.style.border = 'none';
-      cancelBtn.style.borderRadius = '8px';
-      cancelBtn.style.cursor = 'pointer';
-      cancelBtn.style.marginTop = '16px';
-      cancelBtn.style.fontSize = '16px';
+              // Botón de cerrar
+              const cancelBtn = document.createElement("button");
+              cancelBtn.textContent = "❌ Cerrar";
+              cancelBtn.style.padding = "14px 24px";
+              cancelBtn.style.backgroundColor = "#dc3545";
+              cancelBtn.style.color = "white";
+              cancelBtn.style.border = "none";
+              cancelBtn.style.borderRadius = "8px";
+              cancelBtn.style.cursor = "pointer";
+              cancelBtn.style.marginTop = "16px";
+              cancelBtn.style.fontSize = "16px";
 
-      // Añadir elementos al overlay
-      overlay.appendChild(container);
-      overlay.appendChild(cancelBtn);
-      document.body.appendChild(overlay);
+              // Añadir elementos al overlay
+              overlay.appendChild(container);
+              overlay.appendChild(cancelBtn);
+              document.body.appendChild(overlay);
 
-      // Función para cerrar el escáner
-      const closeScanner = () => {
-        try {
-          if (window.html5QrcodeScanner) {
-            window.html5QrcodeScanner.clear();
-            window.html5QrcodeScanner = null;
-          }
-        } catch (e) {
-          console.error('Error al limpiar el escáner:', e);
-        }
-        if (document.body.contains(overlay)) {
-          document.body.removeChild(overlay);
-        }
-      };
+              // Función para cerrar el escáner
+              const closeScanner = () => {
+                try {
+                  if (window.html5QrcodeScanner) {
+                    window.html5QrcodeScanner.clear();
+                    window.html5QrcodeScanner = null;
+                  }
+                } catch (e) {
+                  console.error("Error al limpiar el escáner:", e);
+                }
+                if (document.body.contains(overlay)) {
+                  document.body.removeChild(overlay);
+                }
+              };
 
-      cancelBtn.onclick = closeScanner;
+              cancelBtn.onclick = closeScanner;
 
-      // Inicializar el escáner
-      window.html5QrcodeScanner = new Html5QrcodeScanner(
-        'qr-reader',
-        {
-          fps: 30, // Más fluido
-          qrbox: { width: 300, height: 300 }, // Cuadro centrado
-          facingMode: 'environment' // Fuerza cámara trasera
-        },
-        {
-          rememberLastUsedCamera: true, // Recuerda la última cámara
-          showTorchButton: false // Oculta botón de linterna (opcional)
-        }
-      );
+              // Inicializar el escáner
+              window.html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
+                {
+                  fps: 30, // Más fluido
+                  qrbox: { width: 300, height: 300 }, // Cuadro centrado
+                  facingMode: "environment", // Fuerza cámara trasera
+                },
+                {
+                  rememberLastUsedCamera: true, // Recuerda la última cámara
+                  showTorchButton: false, // Oculta botón de linterna (opcional)
+                }
+              );
 
-      // Cuando se escanea un código
-      window.html5QrcodeScanner.render(
-        (decodedText) => {
-          closeScanner();
-          setSearchCode(decodedText);
-          const found = elementos[decodedText.trim().toUpperCase()];
-          if (found) {
-            setElement(found);
-          } else {
-            alert('Elemento no encontrado');
-          }
-        },
-        (errorMessage) => {
-          // Puedes ignorar errores menores
-        }
-      );
-    };
+              // Cuando se escanea un código
+              window.html5QrcodeScanner.render(
+                (decodedText) => {
+                  closeScanner();
+                  setSearchCode(decodedText);
+                  const found = elementos[decodedText.trim().toUpperCase()];
+                  if (found) {
+                    setElement(found);
+                  } else {
+                    alert("Elemento no encontrado");
+                  }
+                },
+                (errorMessage) => {
+                  // Puedes ignorar errores menores
+                }
+              );
+            };
 
-    script.onerror = () => alert('Error al cargar el escáner: verifica tu conexión');
-    document.head.appendChild(script);
-  }}
-  className="btn btn-primary"
->
-  📷 Escanear QR
-</button>
+            script.onerror = () =>
+              alert("Error al cargar el escáner: verifica tu conexión");
+            document.head.appendChild(script);
+          }}
+          className="btn btn-primary"
+        >
+          📷 Escanear QR
+        </button>
 
         <div className="card">
           <h2>🔍 Buscar por código</h2>
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: "flex", gap: "8px" }}>
             <input
               type="text"
               value={searchCode}
               onChange={(e) => setSearchCode(e.target.value)}
               placeholder="Ej: MAT-001"
               className="input"
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              onKeyPress={(e) => e.key === "Enter" && handleSearch()}
             />
-            <button onClick={handleSearch} className="btn btn-secondary">Buscar</button>
+            <button onClick={handleSearch} className="btn btn-secondary">
+              Buscar
+            </button>
           </div>
         </div>
 
         <div className="card">
           <h3>📋 Reporte de Materiales</h3>
-          <button onClick={() => setMostrarReporte(true)} className="btn btn-info">Ver Reporte</button>
+          <button
+            onClick={() => setMostrarReporte(true)}
+            className="btn btn-info"
+          >
+            Ver Reporte
+          </button>
         </div>
 
         {/* Botón: Mapa de Bauleras */}
         <div className="card">
           <h3>📍 Mapa de Bauleras</h3>
-          <div style={{ marginBottom: '12px' }}>
+          <div style={{ marginBottom: "12px" }}>
             <select
               value={movilSeleccionadoMapa}
               onChange={(e) => setMovilSeleccionadoMapa(e.target.value)}
@@ -449,7 +512,7 @@ const fotosPorMovil = {
           <button
             onClick={() => {
               if (!movilSeleccionadoMapa) {
-                alert('Seleccioná un móvil');
+                alert("Seleccioná un móvil");
                 return;
               }
               setMostrarMapa(true);
@@ -458,102 +521,178 @@ const fotosPorMovil = {
           >
             📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
           </button>
-        </div>  
+        </div>
 
+        {/* MODAL: DETALLE DEL ELEMENTO */}
         {element && (
-          <div className="card ficha">
-            <button
-              onClick={() => setElement(null)}
-              style={{ color: 'blue', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '16px' }}
-            >
-              ← Volver
-            </button>
-              {user && ['operador', 'admin'].includes(user.role) && (
+          <div className="modal">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h2>📋 {element.nombre}</h2>
                 <button
-                  onClick={() => setMostrarFormulario({ ...element })}
-                  className="btn btn-warning"
-                  style={{ marginBottom: '16px' }}
+                  onClick={() => setElement(null)}
+                  className="btn btn-danger"
                 >
-                  ✏️ Editar Elemento
+                  × Cerrar
                 </button>
-              )}
+              </div>
+              <div className="modal-body">
+                <table className="detalle-tabla">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Tipo</strong>
+                      </td>
+                      <td>{element.tipo}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Estado</strong>
+                      </td>
+                      <td>
+                        <span
+                          style={{
+                            color:
+                              element.estado === "Bueno"
+                                ? "green"
+                                : element.estado === "Regular"
+                                ? "orange"
+                                : "red",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {element.estado}
+                        </span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>En servicio</strong>
+                      </td>
+                      <td>{element.en_servicio ? "Sí" : "No"}</td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Ubicación</strong>
+                      </td>
+                      <td>
+                        {element.ubicacion_tipo === "Móvil" &&
+                        element.ubicacion_id
+                          ? `Móvil ${element.ubicacion_id}${
+                              element.baulera_numero
+                                ? `, Baulera ${element.baulera_numero}`
+                                : ""
+                            }`
+                          : element.deposito_nombre
+                          ? `Depósito ${element.deposito_nombre}`
+                          : "No asignado"}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Código QR</strong>
+                      </td>
+                      <td>{element.codigo_qr}</td>
+                    </tr>
+                    {element.caracteristicas && (
+                      <tr>
+                        <td>
+                          <strong>Características</strong>
+                        </td>
+                        <td>{element.caracteristicas}</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
 
-            <h2>{element.nombre}</h2>
-            {element.foto_url && <img src={element.foto_url} alt={element.nombre} />}
-            <p><strong>Tipo:</strong> {element.tipo}</p>
-            <p><strong>Estado:</strong> <span style={{ color: element.estado === 'Bueno' ? 'green' : element.estado === 'Regular' ? 'orange' : 'red', fontWeight: 'bold' }}>{element.estado}</span></p>
-            <p><strong>En servicio:</strong> {element.en_servicio ? 'Sí' : 'No'}</p>
-            <p><strong>Ubicación:</strong> 
-              {element.ubicacion_tipo === 'Móvil' && element.ubicacion_id
-                ? `Móvil ${element.ubicacion_id}${element.baulera_numero ? `, Baulera ${element.baulera_numero}` : ''}`
-                : element.deposito_nombre ? `Depósito ${element.deposito_nombre}` : 'No asignado'}
-            </p>
-            <p><strong>Características:</strong> {element.caracteristicas || 'No especificadas'}</p>
+                {element.foto_url && (
+                  <div className="foto-contenedor">
+                    <img
+                      src={element.foto_url}
+                      alt={element.nombre}
+                      className="foto-modal"
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
-      
-
         {/* PANEL: REPORTE */}
         {mostrarReporte && (
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.5)',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 9999,
-            padding: '20px'
-          }}>
-            <div style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              width: '100%',
-              maxWidth: '800px',
-              maxHeight: '90vh',
-              overflowY: 'auto',
-              boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-            }}>
-              <div style={{
-                padding: '20px',
-                borderBottom: '3px solid #b91c1c',
-                backgroundColor: '#b91c1c',
-                color: 'white',
-                borderTopLeftRadius: '12px',
-                borderTopRightRadius: '12px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0,0,0,0.5)",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              zIndex: 9999,
+              padding: "20px",
+            }}
+          >
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "12px",
+                width: "100%",
+                maxWidth: "800px",
+                maxHeight: "90vh",
+                overflowY: "auto",
+                boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+              }}
+            >
+              <div
+                style={{
+                  padding: "20px",
+                  borderBottom: "3px solid #b91c1c",
+                  backgroundColor: "#b91c1c",
+                  color: "white",
+                  borderTopLeftRadius: "12px",
+                  borderTopRightRadius: "12px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
                 <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
                 <button
                   onClick={() => setMostrarReporte(false)}
                   style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
+                    padding: "8px 16px",
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    cursor: "pointer",
                   }}
                 >
                   × Cerrar
                 </button>
               </div>
 
-              <div style={{ padding: '20px' }}>
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Ver:</label>
+              <div style={{ padding: "20px" }}>
+                <div style={{ marginBottom: "16px" }}>
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      display: "block",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Ver:
+                  </label>
                   <select
                     value={filtroUbicacion}
                     onChange={(e) => {
                       setFiltroUbicacion(e.target.value);
-                      setMovilSeleccionado('');
-                      setDepositoSeleccionado('');
+                      setMovilSeleccionado("");
+                      setDepositoSeleccionado("");
                     }}
                     className="input"
                   >
@@ -564,9 +703,17 @@ const fotosPorMovil = {
                   </select>
                 </div>
 
-                {filtroUbicacion === 'movil' && (
-                  <div style={{ marginBottom: '16px' }}>
-                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Móvil:</label>
+                {filtroUbicacion === "movil" && (
+                  <div style={{ marginBottom: "16px" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        display: "block",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      Seleccionar Móvil:
+                    </label>
                     <select
                       value={movilSeleccionado}
                       onChange={(e) => setMovilSeleccionado(e.target.value)}
@@ -575,22 +722,37 @@ const fotosPorMovil = {
                       <option value="">Todos los móviles</option>
                       {(() => {
                         const moviles = new Set();
-                        Object.values(elementos).forEach(el => {
-                          if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                        Object.values(elementos).forEach((el) => {
+                          if (
+                            el.ubicacion_tipo === "Móvil" &&
+                            el.ubicacion_id
+                          ) {
                             moviles.add(el.ubicacion_id);
                           }
                         });
-                        return Array.from(moviles).sort().map(movil => (
-                          <option key={movil} value={movil}>Móvil {movil}</option>
-                        ));
+                        return Array.from(moviles)
+                          .sort()
+                          .map((movil) => (
+                            <option key={movil} value={movil}>
+                              Móvil {movil}
+                            </option>
+                          ));
                       })()}
                     </select>
                   </div>
                 )}
 
-                {filtroUbicacion === 'deposito' && (
-                  <div style={{ marginBottom: '16px' }}>
-                    <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Depósito:</label>
+                {filtroUbicacion === "deposito" && (
+                  <div style={{ marginBottom: "16px" }}>
+                    <label
+                      style={{
+                        fontWeight: "bold",
+                        display: "block",
+                        marginBottom: "8px",
+                      }}
+                    >
+                      Seleccionar Depósito:
+                    </label>
                     <select
                       value={depositoSeleccionado}
                       onChange={(e) => setDepositoSeleccionado(e.target.value)}
@@ -622,12 +784,14 @@ const fotosPorMovil = {
     <div className="container">
       <div className="header">
         <h1>Materiales BV SMA</h1>
-        <p>Legajo: {user.legajo} • Rol: {user.role}</p>
+        <p>
+          Legajo: {user.legajo} • Rol: {user.role}
+        </p>
       </div>
 
       <button
         onClick={() => {
-          const code = prompt('Ingresa el código QR (ej: MAT-001)');
+          const code = prompt("Ingresa el código QR (ej: MAT-001)");
           if (code) {
             setSearchCode(code);
             setTimeout(handleSearch, 100);
@@ -646,22 +810,27 @@ const fotosPorMovil = {
           onChange={(e) => setSearchCode(e.target.value)}
           placeholder="Ej: MAT-001"
           className="input"
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
         />
-        <button onClick={handleSearch} className="btn btn-secondary">Buscar</button>
+        <button onClick={handleSearch} className="btn btn-secondary">
+          Buscar
+        </button>
       </div>
 
-      {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
-        <div className="card">
-          <h3>➕ Cargar nuevo elemento</h3>
-          <button
-            onClick={() => setMostrarFormulario(true)}
-            className="btn btn-secondary"
-          >
-            + Cargar elemento nuevo
-          </button>
-        </div>
-      )}
+      {user.role !== "lectura" &&
+        !viendoUsuarios &&
+        !mostrarFormulario &&
+        !element && (
+          <div className="card">
+            <h3>➕ Cargar nuevo elemento</h3>
+            <button
+              onClick={() => setMostrarFormulario(true)}
+              className="btn btn-secondary"
+            >
+              + Cargar elemento nuevo
+            </button>
+          </div>
+        )}
 
       {mostrarFormulario && (
         <FormularioCarga
@@ -669,17 +838,17 @@ const fotosPorMovil = {
           onCreate={(nuevo) => {
             const data = {
               ...nuevo,
-              codigo_qr: nuevo.codigo_qr.toUpperCase()
+              codigo_qr: nuevo.codigo_qr.toUpperCase(),
             };
             const crear = async () => {
-              const { error } = await supabase.from('elementos').insert([data]);
+              const { error } = await supabase.from("elementos").insert([data]);
               if (error) {
-                alert('Error: ' + error.message);
+                alert("Error: " + error.message);
               } else {
-                alert('✅ Elemento creado');
-                const { data } = await supabase.from('elementos').select('*');
+                alert("✅ Elemento creado");
+                const { data } = await supabase.from("elementos").select("*");
                 const map = {};
-                data.forEach(el => {
+                data.forEach((el) => {
                   map[el.codigo_qr] = el;
                 });
                 setElementos(map);
@@ -691,9 +860,9 @@ const fotosPorMovil = {
         />
       )}
 
-      {user.role === 'admin' && !mostrarFormulario && !element && (
+      {user.role === "admin" && !mostrarFormulario && !element && (
         <div className="card">
-          <h3 style={{ color: '#6f42c1' }}>👮‍♂️ Acciones de Administrador</h3>
+          <h3 style={{ color: "#6f42c1" }}>👮‍♂️ Acciones de Administrador</h3>
           <button
             onClick={() => setViendoUsuarios(!viendoUsuarios)}
             className="btn btn-warning"
@@ -703,19 +872,31 @@ const fotosPorMovil = {
         </div>
       )}
 
-      {viendoUsuarios && user.role === 'admin' && (
-        <div className="card" style={{ border: '2px solid #6f42c1', padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <h3 style={{ margin: 0, color: '#6f42c1' }}>👥 Gestión de Usuarios</h3>
+      {viendoUsuarios && user.role === "admin" && (
+        <div
+          className="card"
+          style={{ border: "2px solid #6f42c1", padding: "20px" }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}
+          >
+            <h3 style={{ margin: 0, color: "#6f42c1" }}>
+              👥 Gestión de Usuarios
+            </h3>
             <button
               onClick={() => setViendoUsuarios(false)}
               style={{
-                padding: '6px 12px',
-                backgroundColor: '#dc3545',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
+                padding: "6px 12px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
               }}
             >
               × Cerrar
@@ -724,108 +905,166 @@ const fotosPorMovil = {
 
           <button
             onClick={() => {
-              const legajo = prompt('Legajo (3 dígitos)');
+              const legajo = prompt("Legajo (3 dígitos)");
               if (!legajo || !/^\d{3}$/.test(legajo)) {
-                alert('Legajo debe ser de 3 dígitos');
+                alert("Legajo debe ser de 3 dígitos");
                 return;
               }
-              const nombre = prompt('Nombre');
+              const nombre = prompt("Nombre");
               if (!nombre) return;
-              const apellido = prompt('Apellido');
+              const apellido = prompt("Apellido");
               if (!apellido) return;
-              const password = prompt('Contraseña');
+              const password = prompt("Contraseña");
               if (!password) return;
-              const rango = prompt('Rango (opcional)', '');
-              const cuartelInput = prompt('Cuartel: Cuartel 1 o Cuartel 2', 'Cuartel 1');
-              const cuartel = cuartelInput === '2' ? 'Cuartel 2' : 'Cuartel 1';
-              const roleInput = prompt('Rol: lectura, operador, admin', 'lectura');
-              const role = ['lectura', 'operador', 'admin'].includes(roleInput) ? roleInput : 'lectura';
-              const nuevo = { legajo, password, nombre, apellido, rango: rango || null, cuartel, role };
+              const rango = prompt("Rango (opcional)", "");
+              const cuartelInput = prompt(
+                "Cuartel: Cuartel 1 o Cuartel 2",
+                "Cuartel 1"
+              );
+              const cuartel = cuartelInput === "2" ? "Cuartel 2" : "Cuartel 1";
+              const roleInput = prompt(
+                "Rol: lectura, operador, admin",
+                "lectura"
+              );
+              const role = ["lectura", "operador", "admin"].includes(roleInput)
+                ? roleInput
+                : "lectura";
+              const nuevo = {
+                legajo,
+                password,
+                nombre,
+                apellido,
+                rango: rango || null,
+                cuartel,
+                role,
+              };
               const guardar = async () => {
-                const { error } = await supabase.from('usuarios').insert([nuevo]);
+                const { error } = await supabase
+                  .from("usuarios")
+                  .insert([nuevo]);
                 if (error) {
-                  alert('Error: ' + error.message);
+                  alert("Error: " + error.message);
                 } else {
-                  alert('✅ Usuario agregado');
-                  const { data } = await supabase.from('usuarios').select('*');
+                  alert("✅ Usuario agregado");
+                  const { data } = await supabase.from("usuarios").select("*");
                   setUsuarios(data);
                 }
               };
               guardar();
             }}
             style={{
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              padding: '10px 16px',
-              borderRadius: '6px',
-              fontSize: '14px',
-              fontWeight: 'bold',
-              marginBottom: '16px'
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              padding: "10px 16px",
+              borderRadius: "6px",
+              fontSize: "14px",
+              fontWeight: "bold",
+              marginBottom: "16px",
             }}
           >
             + Agregar Usuario
           </button>
 
-          <div style={{ maxHeight: '400px', overflowY: 'auto', border: '1px solid #ddd', borderRadius: '6px' }}>
+          <div
+            style={{
+              maxHeight: "400px",
+              overflowY: "auto",
+              border: "1px solid #ddd",
+              borderRadius: "6px",
+            }}
+          >
             {usuarios.length === 0 ? (
-              <p style={{ textAlign: 'center', color: '#666', padding: '16px' }}>No hay usuarios</p>
+              <p
+                style={{ textAlign: "center", color: "#666", padding: "16px" }}
+              >
+                No hay usuarios
+              </p>
             ) : (
-              usuarios.map(u => (
-                <div key={u.id} style={{ padding: '12px', borderBottom: '1px solid #eee', backgroundColor: '#f8f9fa' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              usuarios.map((u) => (
+                <div
+                  key={u.id}
+                  style={{
+                    padding: "12px",
+                    borderBottom: "1px solid #eee",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
                     <div>
-                      <strong>{u.nombre} {u.apellido}</strong> ({u.legajo})
+                      <strong>
+                        {u.nombre} {u.apellido}
+                      </strong>{" "}
+                      ({u.legajo})
                     </div>
                     <div>
                       <button
                         onClick={() => {
-                          const nuevoNombre = prompt('Nombre', u.nombre);
-                          const nuevoApellido = prompt('Apellido', u.apellido);
-                          const nuevoRango = prompt('Rango', u.rango || '');
-                          const nuevoCuartel = prompt('Cuartel', u.cuartel);
-                          const nuevoRole = prompt('Rol', u.role);
+                          const nuevoNombre = prompt("Nombre", u.nombre);
+                          const nuevoApellido = prompt("Apellido", u.apellido);
+                          const nuevoRango = prompt("Rango", u.rango || "");
+                          const nuevoCuartel = prompt("Cuartel", u.cuartel);
+                          const nuevoRole = prompt("Rol", u.role);
                           const editar = async () => {
                             const { error } = await supabase
-                              .from('usuarios')
+                              .from("usuarios")
                               .update({
                                 nombre: nuevoNombre,
                                 apellido: nuevoApellido,
                                 rango: nuevoRango || null,
                                 cuartel: nuevoCuartel,
-                                role: ['lectura', 'operador', 'admin'].includes(nuevoRole) ? nuevoRole : u.role
+                                role: ["lectura", "operador", "admin"].includes(
+                                  nuevoRole
+                                )
+                                  ? nuevoRole
+                                  : u.role,
                               })
-                              .eq('id', u.id);
+                              .eq("id", u.id);
                             if (error) {
-                              alert('Error: ' + error.message);
+                              alert("Error: " + error.message);
                             } else {
-                              const { data } = await supabase.from('usuarios').select('*');
+                              const { data } = await supabase
+                                .from("usuarios")
+                                .select("*");
                               setUsuarios(data);
                             }
                           };
                           editar();
                         }}
                         style={{
-                          padding: '6px 10px',
-                          backgroundColor: '#ffc107',
-                          color: 'black',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          marginRight: '8px'
+                          padding: "6px 10px",
+                          backgroundColor: "#ffc107",
+                          color: "black",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
+                          marginRight: "8px",
                         }}
                       >
                         ✏️
                       </button>
                       <button
                         onClick={() => {
-                          if (confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)) {
+                          if (
+                            confirm(`¿Eliminar a ${u.nombre} ${u.apellido}?`)
+                          ) {
                             const borrar = async () => {
-                              const { error } = await supabase.from('usuarios').delete().eq('id', u.id);
+                              const { error } = await supabase
+                                .from("usuarios")
+                                .delete()
+                                .eq("id", u.id);
                               if (error) {
-                                alert('Error: ' + error.message);
+                                alert("Error: " + error.message);
                               } else {
-                                const { data } = await supabase.from('usuarios').select('*');
+                                const { data } = await supabase
+                                  .from("usuarios")
+                                  .select("*");
                                 setUsuarios(data);
                               }
                             };
@@ -833,20 +1072,22 @@ const fotosPorMovil = {
                           }
                         }}
                         style={{
-                          padding: '6px 10px',
-                          backgroundColor: '#dc3545',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
+                          padding: "6px 10px",
+                          backgroundColor: "#dc3545",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          cursor: "pointer",
                         }}
                       >
                         🗑️
                       </button>
                     </div>
                   </div>
-                  <div style={{ fontSize: '14px', color: '#555' }}>
-                    <span>Rango: {u.rango || '–'}</span> • <span>Cuartel: {u.cuartel || '–'}</span> • <span>Rol: {u.role}</span>
+                  <div style={{ fontSize: "14px", color: "#555" }}>
+                    <span>Rango: {u.rango || "–"}</span> •{" "}
+                    <span>Cuartel: {u.cuartel || "–"}</span> •{" "}
+                    <span>Rol: {u.role}</span>
                   </div>
                 </div>
               ))
@@ -855,81 +1096,95 @@ const fotosPorMovil = {
         </div>
       )}
 
-
-
-      {user.role !== 'lectura' && !viendoUsuarios && !mostrarFormulario && !element && (
-        <div className="card">
-          <h3>📋 Reporte de Materiales</h3>
-          <button
-            onClick={() => setMostrarReporte(true)}
-            className="btn btn-info"
-          >
-            Ver Reporte de Materiales
-          </button>
-
-        </div>
-      )}
+      {user.role !== "lectura" &&
+        !viendoUsuarios &&
+        !mostrarFormulario &&
+        !element && (
+          <div className="card">
+            <h3>📋 Reporte de Materiales</h3>
+            <button
+              onClick={() => setMostrarReporte(true)}
+              className="btn btn-info"
+            >
+              Ver Reporte de Materiales
+            </button>
+          </div>
+        )}
 
       {/* PANEL: REPORTE */}
       {mostrarReporte && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 9999,
-          padding: '20px'
-        }}>
-          <div style={{
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
-          }}>
-            <div style={{
-              padding: '20px',
-              borderBottom: '3px solid #b91c1c',
-              backgroundColor: '#b91c1c',
-              color: 'white',
-              borderTopLeftRadius: '12px',
-              borderTopRightRadius: '12px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 9999,
+            padding: "20px",
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              width: "100%",
+              maxWidth: "800px",
+              maxHeight: "90vh",
+              overflowY: "auto",
+              boxShadow: "0 10px 30px rgba(0,0,0,0.3)",
+            }}
+          >
+            <div
+              style={{
+                padding: "20px",
+                borderBottom: "3px solid #b91c1c",
+                backgroundColor: "#b91c1c",
+                color: "white",
+                borderTopLeftRadius: "12px",
+                borderTopRightRadius: "12px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <h2 style={{ margin: 0 }}>📋 Reporte de Materiales</h2>
               <button
                 onClick={() => setMostrarReporte(false)}
                 style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: 'pointer'
+                  padding: "8px 16px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
                 }}
               >
                 × Cerrar
               </button>
             </div>
 
-            <div style={{ padding: '20px' }}>
-              <div style={{ marginBottom: '16px' }}>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Ver:</label>
+            <div style={{ padding: "20px" }}>
+              <div style={{ marginBottom: "16px" }}>
+                <label
+                  style={{
+                    fontWeight: "bold",
+                    display: "block",
+                    marginBottom: "8px",
+                  }}
+                >
+                  Ver:
+                </label>
                 <select
                   value={filtroUbicacion}
                   onChange={(e) => {
                     setFiltroUbicacion(e.target.value);
-                    setMovilSeleccionado('');
-                    setDepositoSeleccionado('');
+                    setMovilSeleccionado("");
+                    setDepositoSeleccionado("");
                   }}
                   className="input"
                 >
@@ -940,9 +1195,17 @@ const fotosPorMovil = {
                 </select>
               </div>
 
-              {filtroUbicacion === 'movil' && (
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Móvil:</label>
+              {filtroUbicacion === "movil" && (
+                <div style={{ marginBottom: "16px" }}>
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      display: "block",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Seleccionar Móvil:
+                  </label>
                   <select
                     value={movilSeleccionado}
                     onChange={(e) => setMovilSeleccionado(e.target.value)}
@@ -951,22 +1214,34 @@ const fotosPorMovil = {
                     <option value="">Todos los móviles</option>
                     {(() => {
                       const moviles = new Set();
-                      Object.values(elementos).forEach(el => {
-                        if (el.ubicacion_tipo === 'Móvil' && el.ubicacion_id) {
+                      Object.values(elementos).forEach((el) => {
+                        if (el.ubicacion_tipo === "Móvil" && el.ubicacion_id) {
                           moviles.add(el.ubicacion_id);
                         }
                       });
-                      return Array.from(moviles).sort().map(movil => (
-                        <option key={movil} value={movil}>Móvil {movil}</option>
-                      ));
+                      return Array.from(moviles)
+                        .sort()
+                        .map((movil) => (
+                          <option key={movil} value={movil}>
+                            Móvil {movil}
+                          </option>
+                        ));
                     })()}
                   </select>
                 </div>
               )}
 
-              {filtroUbicacion === 'deposito' && (
-                <div style={{ marginBottom: '16px' }}>
-                  <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '8px' }}>Seleccionar Depósito:</label>
+              {filtroUbicacion === "deposito" && (
+                <div style={{ marginBottom: "16px" }}>
+                  <label
+                    style={{
+                      fontWeight: "bold",
+                      display: "block",
+                      marginBottom: "8px",
+                    }}
+                  >
+                    Seleccionar Depósito:
+                  </label>
                   <select
                     value={depositoSeleccionado}
                     onChange={(e) => setDepositoSeleccionado(e.target.value)}
@@ -985,18 +1260,11 @@ const fotosPorMovil = {
               >
                 🖨️ Imprimir Reporte
               </button>
-
-              
             </div>
           </div>
         </div>
-
-
-
       )}
     </div>
-    
-
   );
 }
 
