@@ -279,20 +279,25 @@ function App() {
     ventana.document.close();
   };
 
-  {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
 {mostrarMapa && movilSeleccionadoMapa && (
-  <div className="modal">
-    <div className="modal-content">
-      <div className="modal-header">
-        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
-        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
-          × Cerrar
-        </button>
-      </div>
-      <div className="modal-body">
-        ...
-      </div>
-    </div>
+  <div
+    key={movilSeleccionadoMapa}
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      padding: '20px'
+    }}
+  >
+    {/* Contenido del modal */}
   </div>
 )}
 
