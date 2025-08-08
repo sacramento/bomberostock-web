@@ -282,6 +282,96 @@ function App() {
 
   // --- VISTA PÚBLICA ---
   if (!user) {
+
+    {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{mostrarMapa && movilSeleccionadoMapa && (
+  <div
+    key={movilSeleccionadoMapa}
+    style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0,0,0,0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      padding: '20px'
+    }}
+  >
+    <div style={{
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      width: '100%',
+      maxWidth: '800px',
+      maxHeight: '90vh',
+      overflowY: 'auto',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.3)'
+    }}>
+      <div style={{
+        padding: '20px',
+        borderBottom: '3px solid #b91c1c',
+        backgroundColor: '#b91c1c',
+        color: 'white',
+        borderTopLeftRadius: '12px',
+        borderTopRightRadius: '12px',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center'
+      }}>
+        <h2 style={{ margin: 0 }}>📸 Móvil {movilSeleccionadoMapa}</h2>
+        <button
+          onClick={() => setMostrarMapa(false)}
+          style={{
+            padding: '8px 16px',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          × Cerrar
+        </button>
+      </div>
+
+      <div style={{ padding: '20px' }}>
+        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '15px'
+          }}
+        >
+          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
+            <div key={index} style={{ textAlign: 'center' }}>
+              <img
+                src={url}
+                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
+                style={{
+                  width: '100%',
+                  maxHeight: '200px',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  border: '2px solid #ddd'
+                }}
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
+                  e.target.style.backgroundColor = '#f0f0f0';
+                }}
+              />
+              <p style={{ margin: '8px 0 0 0', fontSize: '14px' }}>Vista {index + 1}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
     return (
       <div className="container">
         <div className="header">
@@ -736,6 +826,7 @@ function App() {
           </div>
         )}
       </div>
+
     );
   }
 
