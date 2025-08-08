@@ -483,17 +483,20 @@ function App() {
     </select>
   </div>
   <button
-    onClick={() => {
-      if (!movilSeleccionadoMapa) {
-        alert('Seleccioná un móvil');
-        return;
-      }
-      setMostrarMapa(true);
-    }}
-    className="btn btn-warning"
-  >
-    📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
-  </button>
+  onClick={() => {
+    console.log('Botón clickeado');
+    console.log('Móvil seleccionado:', movilSeleccionadoMapa);
+    if (!movilSeleccionadoMapa) {
+      alert('Seleccioná un móvil');
+      return;
+    }
+    console.log('Abriendo modal...');
+    setMostrarMapa(true);
+  }}
+  className="btn btn-warning"
+>
+  📸 Ver Fotos del Móvil {movilSeleccionadoMapa}
+</button>
 </div>
 
         {/* MODAL: DETALLE DEL ELEMENTO */}
