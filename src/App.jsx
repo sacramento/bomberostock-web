@@ -45,6 +45,38 @@ function App() {
     // Agregá más móviles si tenés
   };
 
+  {/* PANEL: FOTOS DE BAULERAS POR MÓVIL */}
+{mostrarMapa && movilSeleccionadoMapa && (
+  <div className="modal">
+    <div className="modal-content">
+      <div className="modal-header">
+        <h2>📸 Móvil {movilSeleccionadoMapa}</h2>
+        <button onClick={() => setMostrarMapa(false)} className="btn btn-danger">
+          × Cerrar
+        </button>
+      </div>
+      <div className="modal-body">
+        <p>Estás viendo las vistas del <strong>Móvil {movilSeleccionadoMapa}</strong></p>
+        <div className="grid-2">
+          {fotosPorMovil[movilSeleccionadoMapa]?.map((url, index) => (
+            <div key={index} className="foto-item">
+              <img
+                src={url}
+                alt={`Vista ${index + 1} del Móvil ${movilSeleccionadoMapa}`}
+                className="foto-img"
+                onError={(e) => {
+                  e.target.src = 'https://via.placeholder.com/300x200?text=Foto+no+cargada';
+                }}
+              />
+              <p className="foto-label">Vista {index + 1}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
   // Cargar elementos
   useEffect(() => {
     const cargarElementos = async () => {
