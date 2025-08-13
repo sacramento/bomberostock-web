@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Proyecto BomberoStock - Cuartel de Bomberos</title>
+  <style>
+    @media print {
+      @page {
+        margin: 2cm;
+      }
+      body {
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+      }
+    }
+
+    body {
+      font-family: 'Georgia', 'Times New Roman', serif;
+      background-color: #f4f4f4;
+      color: #333;
+      line-height: 1.8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 1000px;
+      margin: 50px auto;
+      padding: 40px;
+      background-color: white;
+      box-shadow: 0 6px 30px rgba(0,0,0,0.15);
+      border-radius: 16px;
+      border: 1px solid #ddd;
+    }
+    header {
+      position: relative;
+      padding: 25px 20px;
+      border-bottom: 3px solid #b91c1c;
+      margin-bottom: 30px;
+    }
+    header img {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      height: 80px;
+      width: auto;
+      border-radius: 8px;
+    }
+    header h1, header p {
+      margin-left: 120px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+      color: #b91c1c;
+      font-weight: bold;
+    }
+    header p {
+      margin: 8px 0 0 0;
+      color: #444;
+      font-size: 17px;
+      font-style: normal;
+    }
+    section {
+      margin-bottom: 30px;
+    }
+    h2 {
+      color: #b91c1c;
+      border-left: 6px solid #b91c1c;
+      padding-left: 14px;
+      margin: 30px 0 18px 0;
+      font-size: 1.5rem;
+    }
+    h3 {
+      color: #444;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    p {
+      margin: 12px 0;
+      text-align: justify;
+    }
+    ul, ol {
+      margin: 12px 0;
+      padding-left: 22px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    table th {
+      background-color: #b91c1c;
+      color: white;
+      text-align: left;
+      padding: 14px 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    table td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      color: #444;
+    }
+    table tr:nth-child(even) {
+      background-color: #fdf2f2;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 60px;
+      color: #777;
+      font-size: 14px;
+      border-top: 1px solid #eee;
+      padding-top: 20px;
+      font-style: italic;
+    }
+    .btn-print {
+      display: block;
+      width: 220px;
+      margin: 40px auto 20px;
+      padding: 14px;
+      background-color: #b91c1c;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    @media print {
+      .btn-print { display: none; }
+      .container {
+        box-shadow: none;
+        border: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <header>
+      <img src="bvsma.png" alt="Logo del Cuartel" style="height: 150px; width: auto; border-radius: 8px;">
+      <h1>Proyecto BomberoStock</h1>
+      <p>Sistema Digital de Gestión de Materiales<br>
+         Cuartel de Bomberos Voluntarios de San Martín de los Andes</p>
+    </header>
+
+    <section>
+      <h2>📌 Objetivo</h2>
+      <p>Implementar un sistema digital para registrar, ubicar y controlar todos los materiales del cuartel, optimizando tiempos, evitando pérdidas y facilitando reportes para inspecciones y auditorías.</p>
+    </section>
+
+    <section>
+      <h2>🚀 Beneficios</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Antes</th>
+            <th>Ahora</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Buscar un elemento tomaba minutos</td>
+            <td>Se escanea el QR y se ve en segundos</td>
+          </tr>
+          <tr>
+            <td>No se sabía dónde estaba cada material</td>
+            <td>Ubicación exacta: móvil, depósito o en uso</td>
+          </tr>
+          <tr>
+            <td>Relevamientos manuales y lentos</td>
+            <td>Reporte automático en un clic</td>
+          </tr>
+          <tr>
+            <td>Fotos de bauleras dispersas</td>
+            <td>Acceso directo desde la app por móvil</td>
+          </tr>
+          <tr>
+            <td>Sin historial de inspección</td>
+            <td>Registro de fecha de última verificación</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>🔧 Implementación por Etapas</h2>
+      <h3>Fase 1: Prueba piloto con el Móvil 18</h3>
+      <ul>
+        <li>Etiquetado de todos los elementos del Móvil 18</li>
+        <li>Carga en la app: nombre, tipo, estado, ubicación, foto, características</li>
+        <li>Generación de códigos QR para cada elemento</li>
+        <li>Duración estimada: 2-3 semanas</li>
+      </ul>
+
+      <h3>Fase 2: Expansión a otros móviles y depósitos</h3>
+      <ul>
+        <li>Aplicación del sistema a Móvil 2, Móvil 3, Depósito 1 y Depósito 2</li>
+        <li>Asignación de un operador responsable del mantenimiento</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>📱 Funcionamiento de la App</h2>
+      <ol>
+        <li><strong>Escaneo de QR:</strong> Se escanea el código y aparece toda la información del elemento.</li>
+        <li><strong>Búsqueda manual:</strong> Por código (ej: MAT-001).</li>
+        <li><strong>Reporte automático:</strong> Genera listado completo o por ubicación, listo para imprimir.</li>
+        <li><strong>Fotos de bauleras:</strong> Acceso a imágenes por móvil para ver cómo se cargan.</li>
+        <li><strong>Gestión de usuarios:</strong> Solo el administrador puede crear operadores.</li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>🛠️ Requisitos para Implementar</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Elemento</th>
+            <th>Descripción</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Etiquetadora térmica</td>
+            <td>Ya contamos con una en el cuartel</td>
+          </tr>
+          <tr>
+            <td>Etiquetas resistentes</td>
+            <td>Resistentes a agua, calor y frío</td>
+          </tr>
+          <tr>
+            <td>Celular o tablet</td>
+            <td>Para escanear QR y consultar datos (puede usarse el propio)</td>
+          </tr>
+          <tr>
+            <td>Computadora</td>
+            <td>Para carga inicial de elementos</td>
+          </tr>
+          <tr>
+            <td>Acceso a internet</td>
+            <td>Para sincronizar datos (solo al cargar)</td>
+          </tr>
+          <tr>
+            <td>Impresora (opcional)</td>
+            <td>Para imprimir reportes</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>📈 Ventajas a Largo Plazo</h2>
+      <ul>
+        <li>Historial de inspecciones y mantenimiento</li>
+        <li>Acceso desde cualquier dispositivo</li>
+        <li>Seguridad con roles de usuario (lectura, operador, admin)</li>
+        <li>Sistema escalable a todo el parque automotor y depósitos</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>✅ Conclusión</h2>
+      <p><strong>BomberoStock</strong> es una herramienta <strong>hecha por bomberos, para bomberos</strong>. Es simple, funcional y se adapta a la realidad del cuartel.</p>
+      <p>Con solo <strong>un móvil etiquetado</strong>, ya se empiezan a ver los beneficios. Y cuando se expande, el control del material será total.</p>
+    </section>
+
+    <div class="footer">
+      Proyecto presentado por: [Contreras Nicolas 01/262]<br>
+      Agosto 2025<br>
+      <strong>Cuartel de Bomberos Voluntarios de San Martín de los Andes</strong>
+    </div>
+
+  </div>
+
+  <button class="btn-print" onclick="window.print()">🖨️ Exportar a PDF</button>
+
+</body>
+</html>
